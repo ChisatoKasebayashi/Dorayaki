@@ -34,7 +34,7 @@ void GetColorHistogram::drawCircle(int radius, CvPoint center)
 void GetColorHistogram::mouseEvent()
 {
 	cvSetMouseCallback("Picture",mouse);
-	cout << "2点をクリックする" << endl;
+	cout << "2点をクリックする(LEFT:中心, RIGHT:円弧)" << endl;
 	cvWaitKey(0);
 	radius = evaluateRadius();
 }
@@ -42,14 +42,14 @@ void GetColorHistogram::mouseEvent()
 
 int GetColorHistogram::evaluateRadius()
 {
-	int deff[1];
+	int deff[2];
 	double result;
 	deff[0] = abs(click_x[0] - click_x[1]);
 	deff[1] = abs(click_y[0] - click_y[1]);
-	cout << "deff[X] = " << deff[0] << "," << "deff[Y] = " << deff[1] << endl;
+	//cout << "deff[X] = " << deff[0] << "," << "deff[Y] = " << deff[1] << endl;
 	result = pow(deff[0],2) + pow(deff[1],2);
 	result = sqrt(result);
-	cout << "r = " << result << endl;
+	//cout << "r = " << result << endl;
 	return (int)result;
 }
 
