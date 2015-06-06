@@ -3,28 +3,54 @@
 
 
 GetColorHistogram::GetColorHistogram()
-	:radius(100)
-	,img(cvLoadImage("142.png", CV_LOAD_IMAGE_COLOR))
+	:radius(0)
+	,img_origin(cvLoadImage("142.png", CV_LOAD_IMAGE_COLOR))
+	,img(img_origin)
 {
 	cvNamedWindow("Picture",CV_WINDOW_AUTOSIZE);
-	cvSetMouseCallback("Picture",mouse);
-	center = cvPoint(img->width/2, img->height/2);
+	cvShowImage("Picture",img);
+	mouseEvent();
+	center = cvPoint(click_x[0], click_y[0]);
 	drawCircle(radius, center);
 	cvShowImage("Picture",img);
 	cvWaitKey(0);
 }
 
-GetColorHistogram::~GetColorHistogram(){
+GetColorHistogram::~GetColorHistogram()
+{
 	cvReleaseImage(&img);
 	cvDestroyWindow("Picture");
 }
 
-void GetColorHistogram::drawCircle(int radius, CvPoint center){
+void GetColorHistogram::drawCircle(int radius, CvPoint center)
+{
 	CvScalar color = CV_RGB(255 ,0 ,0);
 	int thickness = 1;
 	int linetype = 8;
 	int shift = 3;
 	cvCircle(img ,center, radius, color, thickness, linetype, shift);
+}
+
+void GetColorHistogram::mouseEvent()
+{
+	cvSetMouseCallback("Picture",mouse);
+	cout << "2点をクリックする" << endl;
+	cvWaitKey(0);
+	radius = evaluateRadius();
+}
+
+
+int GetColorHistogram::evaluateRadius()
+{
+	int deff[1];
+	double result;
+	deff[0] = abs(click_x[0] - click_x[1]);
+	deff[1] = abs(click_y[0] - click_y[1]);
+	cout << "deff[X] = " << deff[0] << "," << "deff[Y] = " << deff[1] << endl;
+	result = pow(deff[0],2) + pow(deff[1],2);
+	result = sqrt(result);
+	cout << "r = " << result << endl;
+	return (int)result;
 }
 
 #if 0	//ボール半径改変中
@@ -77,15 +103,15 @@ void mouse(int event,int x, int y,int flags,void *param=NULL)
 	switch(event)
 	{
 		case CV_EVENT_LBUTTONDOWN:
-			std::cout<<x<<","<<y<<"\n";
-			click_x = x;
-			click_y = y;
+			std::cout<<"click[0]  "<<x<<","<<y<<"\n";
+			click_x[0] = x;
+			click_y[0] = y;
 			break;
 		
 		case CV_EVENT_RBUTTONDOWN:
-			std::cout<<x<<","<<y<<"\n";
-			click_x = x;
-			click_y = y;
+			std::cout<<"click[1]  "<<x<<","<<y<<"\n";
+			click_x[1] = x;
+			click_y[1] = y;
 			break;
 
 		default:
