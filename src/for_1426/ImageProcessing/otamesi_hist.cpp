@@ -3,25 +3,39 @@
 
 
 GetColorHistogram::GetColorHistogram()
-	:radius(0)
-	,img_origin(cvLoadImage("142.png", CV_LOAD_IMAGE_COLOR))
+	:radius(0)	,img_origin(cvLoadImage("142.png", CV_LOAD_IMAGE_COLOR))
 	,img(img_origin)
+	,img_ycrcb(cvCreateImage(cvGetSize(img_origin),8,3))
+	,histgram(new int[NUM_HISTGRAM])
+	,normalizedHistgram(new float[NUM_HISTGRAM])
 {
+	clearColorHistgram();
+	cvCvtColor(img_origin, img_ycrcb, CV_BGR2YCrCb);
 	cvNamedWindow("Picture",CV_WINDOW_AUTOSIZE);
-	cvShowImage("Picture",img);
+	cvShowImage("Picture",img_origin);
 	mouseEvent();
 	center = cvPoint(click_x[0], click_y[0]);
 	drawCircle(radius, center);
+	getColorHistgram(click_x[0], click_y[0], radius, 100);
 	cvShowImage("Picture",img);
 	cvWaitKey(0);
 }
 
 GetColorHistogram::~GetColorHistogram()
 {
+	//delete[] ballSize;
+	delete[] histgram;
+	//delete[] referenceHistgram;
+	delete[] normalizedHistgram;
 	cvReleaseImage(&img);
 	cvDestroyWindow("Picture");
 }
 
+/*
+ 円を描画
+  - radius 半径
+  - center 中心座標
+*/
 void GetColorHistogram::drawCircle(int radius, CvPoint center)
 {
 	CvScalar color = CV_RGB(255 ,0 ,0);
@@ -30,7 +44,9 @@ void GetColorHistogram::drawCircle(int radius, CvPoint center)
 	int shift = 3;
 	cvCircle(img ,center, radius, color, thickness, linetype, shift);
 }
-
+/*
+ クリックで座標を取得するまで待機
+*/
 void GetColorHistogram::mouseEvent()
 {
 	cvSetMouseCallback("Picture",mouse);
@@ -39,7 +55,9 @@ void GetColorHistogram::mouseEvent()
 	radius = evaluateRadius();
 }
 
-
+/*
+ 右クリック,左クリックで取得した座標から距離を算出
+*/
 int GetColorHistogram::evaluateRadius()
 {
 	int deff[2];
@@ -53,8 +71,67 @@ int GetColorHistogram::evaluateRadius()
 	return (int)result;
 }
 
-#if 0	//ボール半径改変中
+/*
+ ImageProcessing::getColorHistgram
+*/
+int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
+{
+		int x0 = max(x - r, 0);
+		int y0 = max(y - r, 0);
+		int x1 = min(x + r, img_ycrcb->width);
+		int y1 = min(y + r, img_ycrcb->height);
+		int search_width  = x1 - x0;
+		int search_height = y1 - y0;
+		int square_r = r * r;
+		
+		char *image = img_ycrcb->imageData;
 
+		if ((search_width == 0)||(search_height == 0)) return -1;
+
+		for (int i = 0; i < no_point;){
+			int xt = x0 + rand() % search_width;
+			int yt = y0 + rand() % search_height;
+			int square = (x - xt) * (x - xt) + (y - yt) * (y - yt);
+			if (square >= square_r){
+				continue;
+			}
+			
+			unsigned char *p = (unsigned char *)&image[(yt * img_ycrcb->width + xt) * 3];
+			
+			int y = p[0];
+			int u = p[1];
+			int v = p[2];
+			
+			int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
+			assert((hist < 64)&&(hist >= 0));
+			histgram[hist] ++;
+			i++;
+		}
+
+		for(int i = 0; i < NUM_HISTGRAM; i ++){
+			normalizedHistgram[i] = (float)histgram[i] / no_point;
+			cout << "[" << i <<"]  " << normalizedHistgram[i] << endl;
+		}
+
+		return 0;
+}
+
+/*
+ imageProcessing::clearColorHistgram
+*/
+void GetColorHistogram::clearColorHistgram()
+	{
+		for(int i = 0; i < NUM_HISTGRAM; i ++){
+			histgram[i] = 0;
+			normalizedHistgram[i] = 0;
+		}
+	}
+
+#if 0	//ボール半径改変中
+/*
+ ImageProcessing::initBallSize
+ ImageProcessing::calcBallsize
+*/
 void GetColorHistogram::initBallSize(){
 	int num = (img->width * img->height) / (BALL_SIZE_STEP * BALL_SIZE_STEP);
 	ballSize = new int[num];

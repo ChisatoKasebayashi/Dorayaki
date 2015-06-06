@@ -11,12 +11,16 @@ class GetColorHistogram{
 private:
 //	static const int BALL_SIZE_STEP = 10;
 //	int *ballSize;
+	static const int NUM_HISTGRAM = 64;
 	IplImage *img_origin;
 	IplImage *img;
+	IplImage *img_ycrcb;
 	int x;
 	int y;
 	int radius;
 	CvPoint center;
+	float *normalizedHistgram;
+	int *histgram;
 
 public:
 	GetColorHistogram();
@@ -26,4 +30,6 @@ public:
 	int evaluateRadius();
 //	void calcBallSize();
 //	void initBallSize();
+	int getColorHistgram(int x, int y, int r, int no_point);
+	void clearColorHistgram();
 };
