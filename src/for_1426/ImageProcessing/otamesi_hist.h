@@ -1,10 +1,12 @@
 #include <opencv2\opencv_lib.hpp>
 #include <iostream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 using namespace std;
 
 int click_x[2], click_y[2];
 void mouse(int event ,int x ,int y ,int flags ,void *param);
+ofstream fout("histogram_log.txt");
 
 class GetColorHistogram{
 
@@ -31,5 +33,6 @@ public:
 //	void calcBallSize();
 //	void initBallSize();
 	int getColorHistgram(int x, int y, int r, int no_point);
+	void Outputhistogram();
 	void clearColorHistgram();
 };

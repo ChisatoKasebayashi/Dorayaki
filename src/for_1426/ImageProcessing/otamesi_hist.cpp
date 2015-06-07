@@ -111,9 +111,18 @@ int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
 		for(int i = 0; i < NUM_HISTGRAM; i ++){
 			normalizedHistgram[i] = (float)histgram[i] / no_point;
 			cout << "[" << i <<"]  " << normalizedHistgram[i] << endl;
-		}
 
+			if (!fout){
+				cout << "ŠJ‚¯‚È‚¢‚æ"<< endl;
+			}
+			fout << normalizedHistgram[i] << endl ;
+		}
 		return 0;
+}
+
+void GetColorHistogram::Outputhistogram()
+{
+//”Ä—p«‚Ì‚‚¢‘‚«•û–Íõ’†
 }
 
 /*
