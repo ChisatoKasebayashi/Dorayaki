@@ -1,8 +1,11 @@
 #include <opencv2\opencv_lib.hpp>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <opencv2/opencv.hpp>
 using namespace std;
+
+#define reference_histgram_filename "reference_histgram.txt"
 
 int click_x[2], click_y[2];
 void mouse(int event ,int x ,int y ,int flags ,void *param);
@@ -22,6 +25,7 @@ private:
 	int radius;
 	CvPoint center;
 	float *normalizedHistgram;
+	float *referenceHistgram;
 	int *histgram;
 
 public:
@@ -35,4 +39,5 @@ public:
 	int getColorHistgram(int x, int y, int r, int no_point);
 	void Outputhistogram();
 	void clearColorHistgram();
+	bool loadReferenceColorHistgram(const char *filename);
 };

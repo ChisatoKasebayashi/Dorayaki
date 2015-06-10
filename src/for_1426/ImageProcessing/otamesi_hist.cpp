@@ -8,7 +8,10 @@ GetColorHistogram::GetColorHistogram()
 	,img_ycrcb(cvCreateImage(cvGetSize(img_origin),8,3))
 	,histgram(new int[NUM_HISTGRAM])
 	,normalizedHistgram(new float[NUM_HISTGRAM])
+	,referenceHistgram(new float[NUM_HISTGRAM])
 {
+	for(int i = 0; i < NUM_HISTGRAM; i ++) referenceHistgram[i] = 0;
+	loadReferenceColorHistgram(reference_histgram_filename);
 	clearColorHistgram();
 	cvCvtColor(img_origin, img_ycrcb, CV_BGR2YCrCb);
 	cvNamedWindow("Picture",CV_WINDOW_AUTOSIZE);
@@ -25,7 +28,7 @@ GetColorHistogram::~GetColorHistogram()
 {
 	//delete[] ballSize;
 	delete[] histgram;
-	//delete[] referenceHistgram;
+	delete[] referenceHistgram;
 	delete[] normalizedHistgram;
 	cvReleaseImage(&img);
 	cvDestroyWindow("Picture");
@@ -107,16 +110,21 @@ int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
 			histgram[hist] ++;
 			i++;
 		}
+		float res = 0.0f;
 
 		for(int i = 0; i < NUM_HISTGRAM; i ++){
 			normalizedHistgram[i] = (float)histgram[i] / no_point;
-			cout << "[" << i <<"]  " << normalizedHistgram[i] << endl;
-
+			//cout << "[" << i <<"]  " << normalizedHistgram[i] << endl;
+			res += min(normalizedHistgram[i], referenceHistgram[i]);
+			
 			if (!fout){
 				cout << "ŠJ‚¯‚È‚¢‚æ"<< endl;
+				return 1;
 			}
-			fout << normalizedHistgram[i] << endl ;
+			fout << fixed << setprecision(6) << normalizedHistgram[i] << endl ;
+
 		}
+		cout << "score[" << res << "]" << endl;
 		return 0;
 }
 
@@ -135,6 +143,18 @@ void GetColorHistogram::clearColorHistgram()
 			normalizedHistgram[i] = 0;
 		}
 	}
+
+bool GetColorHistogram::loadReferenceColorHistgram(const char *filename)
+{
+	FILE *fp;
+	if (NULL == (fp = fopen(filename, "rt"))) return false;
+
+	for(int i = 0;  i < NUM_HISTGRAM; i ++){
+		fscanf(fp, "%f", &referenceHistgram[i]);
+	}
+	fclose(fp);
+	return true;
+}
 
 #if 0	//ƒ{[ƒ‹”¼Œa‰ü•Ï’†
 /*
