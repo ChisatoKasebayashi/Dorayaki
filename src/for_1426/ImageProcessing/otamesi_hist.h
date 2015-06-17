@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <opencv2/opencv.hpp>
 using namespace std;
+using namespace cv;
 
 #define reference_histgram_filename "reference_histgram.txt"
 
@@ -40,4 +41,5 @@ public:
 	void Outputhistogram();
 	void clearColorHistgram();
 	bool loadReferenceColorHistgram(const char *filename);
+	void expressHistogram(int no_point);
 };

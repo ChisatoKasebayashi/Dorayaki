@@ -20,6 +20,7 @@ GetColorHistogram::GetColorHistogram()
 	center = cvPoint(click_x[0], click_y[0]);
 	drawCircle(radius, center);
 	getColorHistgram(click_x[0], click_y[0], radius, 100);
+	expressHistogram(0);
 	cvShowImage("Picture",img);
 	cvWaitKey(0);
 }
@@ -154,6 +155,16 @@ bool GetColorHistogram::loadReferenceColorHistgram(const char *filename)
 	}
 	fclose(fp);
 	return true;
+}
+
+void GetColorHistogram::expressHistogram(int no_point)
+{
+	Mat hist_img=Mat(Size(320,240),CV_8UC3,Scalar(177,177,177));
+	for(int i = 0; i < NUM_HISTGRAM; i ++){
+		cv::line(hist_img,Point(0+(i*5),240),Point(0+(i*5),240-(480*normalizedHistgram[i])),CV_RGB(0,51,204),5,4,0);
+	}
+	//cvSaveImage("histogram.png",hist_img);
+	imshow("ヒストグラム",hist_img);
 }
 
 #if 0	//ボール半径改変中
