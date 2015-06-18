@@ -159,9 +159,15 @@ bool GetColorHistogram::loadReferenceColorHistgram(const char *filename)
 
 void GetColorHistogram::expressHistogram(int no_point)
 {
-	Mat hist_img=Mat(Size(320,240),CV_8UC3,Scalar(177,177,177));
+	Mat hist_img=Mat(Size(330,400),CV_8UC3,Scalar(177,177,177));
 	for(int i = 0; i < NUM_HISTGRAM; i ++){
-		cv::line(hist_img,Point(0+(i*5),240),Point(0+(i*5),240-(480*normalizedHistgram[i])),CV_RGB(0,51,204),5,4,0);
+		cv::rectangle(
+            hist_img,
+            cv::Point(5+(i*5),400),
+			//cv::Point(0+(i*5),240-(3*i)),
+            cv::Point(5+(i*5),400-(500*normalizedHistgram[i])),
+            cv::Scalar::all(0),3,4,0);
+		//cv::line(hist_img,Point(0+(i*5),240),Point(0+(i*5),240-(480*normalizedHistgram[i])),CV_RGB(0,51,204),5,4,0);
 	}
 	//cvSaveImage("histogram.png",hist_img);
 	imshow("ƒqƒXƒgƒOƒ‰ƒ€",hist_img);
