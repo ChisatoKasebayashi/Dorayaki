@@ -36,9 +36,9 @@ GetColorHistogram::~GetColorHistogram()
 }
 
 /*
- ‰~‚ğ•`‰æ
-  - radius ”¼Œa
-  - center ’†SÀ•W
+ å††ã‚’æç”»
+  - radius åŠå¾„
+  - center ä¸­å¿ƒåº§æ¨™
 */
 void GetColorHistogram::drawCircle(int radius, CvPoint center)
 {
@@ -49,18 +49,18 @@ void GetColorHistogram::drawCircle(int radius, CvPoint center)
 	cvCircle(img ,center, radius, color, thickness, linetype, shift);
 }
 /*
- ƒNƒŠƒbƒN‚ÅÀ•W‚ğæ“¾‚·‚é‚Ü‚Å‘Ò‹@
+ ã‚¯ãƒªãƒƒã‚¯ã§åº§æ¨™ã‚’å–å¾—ã™ã‚‹ã¾ã§å¾…æ©Ÿ
 */
 void GetColorHistogram::mouseEvent()
 {
 	cvSetMouseCallback("Picture",mouse);
-	cout << "2“_‚ğƒNƒŠƒbƒN‚·‚é(LEFT:’†S, RIGHT:‰~ŒÊ)" << endl;
+	cout << "2ç‚¹ã‚’ã‚¯ãƒªãƒƒã‚¯ã™ã‚‹(LEFT:ä¸­å¿ƒ, RIGHT:å††å¼§)" << endl;
 	cvWaitKey(0);
 	radius = evaluateRadius();
 }
 
 /*
- ‰EƒNƒŠƒbƒN,¶ƒNƒŠƒbƒN‚Åæ“¾‚µ‚½À•W‚©‚ç‹——£‚ğZo
+ å³ã‚¯ãƒªãƒƒã‚¯,å·¦ã‚¯ãƒªãƒƒã‚¯ã§å–å¾—ã—ãŸåº§æ¨™ã‹ã‚‰è·é›¢ã‚’ç®—å‡º
 */
 int GetColorHistogram::evaluateRadius()
 {
@@ -119,7 +119,7 @@ int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
 			res += min(normalizedHistgram[i], referenceHistgram[i]);
 			
 			if (!fout){
-				cout << "ŠJ‚¯‚È‚¢‚æ"<< endl;
+				cout << "é–‹ã‘ãªã„ã‚ˆ"<< endl;
 				return 1;
 			}
 			fout << fixed << setprecision(6) << normalizedHistgram[i] << endl ;
@@ -131,7 +131,7 @@ int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
 
 void GetColorHistogram::Outputhistogram()
 {
-//”Ä—p«‚Ì‚‚¢‘‚«•û–Íõ’†
+//æ±ç”¨æ€§ã®é«˜ã„æ›¸ãæ–¹æ¨¡ç´¢ä¸­
 }
 
 /*
@@ -170,10 +170,10 @@ void GetColorHistogram::expressHistogram(int no_point)
 		//cv::line(hist_img,Point(0+(i*5),240),Point(0+(i*5),240-(480*normalizedHistgram[i])),CV_RGB(0,51,204),5,4,0);
 	}
 	//cvSaveImage("histogram.png",hist_img);
-	imshow("ƒqƒXƒgƒOƒ‰ƒ€",hist_img);
+	imshow("ãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ",hist_img);
 }
 
-#if 0	//ƒ{[ƒ‹”¼Œa‰ü•Ï’†
+#if 0	//ãƒœãƒ¼ãƒ«åŠå¾„æ”¹å¤‰ä¸­
 /*
  ImageProcessing::initBallSize
  ImageProcessing::calcBallsize
