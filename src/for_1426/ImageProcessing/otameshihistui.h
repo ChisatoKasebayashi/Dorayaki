@@ -3,8 +3,13 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QDebug>
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+using namespace cv;
 
 namespace Ui {
 class OtameshiHistUI;
@@ -25,7 +30,26 @@ public slots:
 private:
     Ui::OtameshiHistUI *ui;
     void connectSignals();
+    static const int NUM_HISTGRAM = 64;
+    IplImage *img_origin;
     IplImage *img;
+    IplImage *img_ycrcb;
+    int x;
+    int y;
+    int radius;
+    CvPoint center;
+    float *normalizedHistgram;
+    float *referenceHistgram;
+    int *histgram;
+
+    void initHistogram();
+    void destHistogram();
+    void clearColorHistgram();
+    bool loadReferenceColorHistgram(const char *filename);
+    void mouseEvent();
+    int evaluateRadius();
+    void drawCircle(int radius, CvPoint center);
+
 };
 
 #endif // OTAMESHIHISTUI_H
