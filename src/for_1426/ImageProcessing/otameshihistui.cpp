@@ -14,6 +14,23 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
 {
     ui->setupUi(this);
     connectSignals();
+    ui->graphicsHistgram->setScene(&scene);
+    ui->graphicsEuclid->setScene(&sceneE);
+    ui->graphicsCos->setScene(&sceneC);
+    ui->graphicsNormalize->setScene(&sceneN);
+    QPen pgray(QColor(200, 200, 200));
+    for(int y=-4; y<=4; y++) {
+        scene.addLine(-200, y*20, 200, y*20, pgray);
+        sceneE.addLine(-200, y*20, 200, y*20, pgray);
+        sceneC.addLine(-200, y*20, 200, y*20, pgray);
+        sceneN.addLine(-200, y*20, 200, y*20, pgray);
+    }
+    for(int x=-31; x<=31; x++) {
+        scene.addLine(x*6, -80, x*6, 80, pgray);
+        sceneE.addLine(x*6, -80, x*6, 80, pgray);
+        sceneC.addLine(x*6, -80, x*6, 80, pgray);
+        sceneN.addLine(x*6, -80, x*6, 80, pgray);
+    }
 }
 
 void OtameshiHistUI::connectSignals(){
@@ -42,7 +59,6 @@ void OtameshiHistUI::onpushStar(){
 
 OtameshiHistUI::~OtameshiHistUI()
 {
-    destHistogram();
     delete ui;
 }
 
@@ -57,6 +73,7 @@ void OtameshiHistUI::processingGetColorHistogram(){
     cvShowImage("Picture",img);
     cvWaitKey(0);
     cvDestroyWindow("Picture");
+    destHistogram();
 }
 
 void OtameshiHistUI::initHistogram(){
@@ -195,10 +212,23 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             }
             fout << fixed << setprecision(6) << normalizedHistgram[i] << endl ;
 
+            plotColorHistogram(normalizedHistgram[i],i);
+            plotEuclid(referenceHistgram[i],normalizedHistgram[i],i);
+            plotCosine(referenceHistgram[i],normalizedHistgram[i],i);
+            plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
+
         }
         return 0;
 }
 
+void OtameshiHistUI::plotColorHistogram(float hist, int cnt){
+}
+void OtameshiHistUI::plotEuclid(float ref, float nor, int cnt){
+}
+void OtameshiHistUI::plotCosine(float ref, float nor, int cnt){
+}
+void OtameshiHistUI::plotNormalize(float ref, float nor, int cnt){
+}
 
 void mouse(int event,int x, int y,int flags,void *param=NULL)
 {

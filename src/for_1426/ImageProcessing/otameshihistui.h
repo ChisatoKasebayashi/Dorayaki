@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QDebug>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 #include <fstream>
@@ -41,6 +43,10 @@ private:
     float *normalizedHistgram;
     float *referenceHistgram;
     int *histgram;
+    QGraphicsScene scene;
+    QGraphicsScene sceneE;
+    QGraphicsScene sceneC;
+    QGraphicsScene sceneN;
 
     void processingGetColorHistogram();
     void initHistogram();
@@ -51,6 +57,10 @@ private:
     int evaluateRadius();
     void drawCircle(int radius, CvPoint center);
     int getColorHistgram(int x, int y, int r, int no_point);
+    void plotColorHistogram(float hist,int cnt);
+    void plotEuclid(float ref, float nor, int cnt);
+    void plotCosine(float ref, float nor, int cnt);
+    void plotNormalize(float ref, float nor, int cnt);
 
 };
 
