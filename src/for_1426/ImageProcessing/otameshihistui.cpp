@@ -32,7 +32,7 @@ void OtameshiHistUI::oncheckCVImage(int state){
         initHistogram();
         cvShowImage("Picture",img_origin);
         mouseEvent();
-        cvWaitKey(0);
+        center = cvPoint(click_x[0], click_y[0]);
         drawCircle(radius, center);
         cvDestroyWindow("Picture");
         cvShowImage("Picture",img);
