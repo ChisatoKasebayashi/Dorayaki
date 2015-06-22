@@ -42,6 +42,7 @@ private:
     float *referenceHistgram;
     int *histgram;
 
+    void processingGetColorHistogram();
     void initHistogram();
     void destHistogram();
     void clearColorHistgram();
@@ -49,6 +50,7 @@ private:
     void mouseEvent();
     int evaluateRadius();
     void drawCircle(int radius, CvPoint center);
+    int getColorHistgram(int x, int y, int r, int no_point);
 
 };
 

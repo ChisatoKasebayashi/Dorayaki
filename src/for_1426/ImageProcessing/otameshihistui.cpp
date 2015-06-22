@@ -28,19 +28,8 @@ void OtameshiHistUI::oncheckCVImage(int state){
     if(state){
         ui->labeldebug->setText("checked");
         ui->checkCVImage->setEnabled(false);
-
-        initHistogram();
-        cvShowImage("Picture",img_origin);
-        mouseEvent();
-        center = cvPoint(click_x[0], click_y[0]);
-        drawCircle(radius, center);
-        cvDestroyWindow("Picture");
-        cvShowImage("Picture",img);
-        cvWaitKey(0);
-        cvDestroyWindow("Picture");
-
+        processingGetColorHistogram();
         ui->checkCVImage->setEnabled(true);
-        ui->checkCVImage->setChecked(Qt::Unchecked);
     }
     else{
         ui->labeldebug->setText("unchecked");
@@ -57,6 +46,19 @@ OtameshiHistUI::~OtameshiHistUI()
     delete ui;
 }
 
+void OtameshiHistUI::processingGetColorHistogram(){
+    initHistogram();
+    cvShowImage("Picture",img_origin);
+    mouseEvent();
+    center = cvPoint(click_x[0], click_y[0]);
+    drawCircle(radius, center);
+    getColorHistgram(click_x[0], click_y[0], radius, 100);
+    cvDestroyWindow("Picture");
+    cvShowImage("Picture",img);
+    cvWaitKey(0);
+    cvDestroyWindow("Picture");
+}
+
 void OtameshiHistUI::initHistogram(){
     radius = 0;
     img_origin = cvLoadImage(ui->comboImageName->currentText().toLocal8Bit(), CV_LOAD_IMAGE_COLOR);
@@ -71,6 +73,7 @@ void OtameshiHistUI::initHistogram(){
     clearColorHistgram();
     for(int i = 0; i < NUM_HISTGRAM; i ++) referenceHistgram[i] = 0;
     loadReferenceColorHistgram(reference_histgram_filename);
+    cvNamedWindow("Picture",CV_WINDOW_AUTOSIZE);
 
 }
 
@@ -143,6 +146,59 @@ void OtameshiHistUI::drawCircle(int radius, CvPoint center)
     int shift = 3;
     cvCircle(img ,center, radius, color, thickness, linetype, shift);
 }
+
+/*
+* ImageProcessing::getColorHistgram
+*/
+int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
+{
+        int x0 = max(x - r, 0);
+        int y0 = max(y - r, 0);
+        int x1 = min(x + r, img_ycrcb->width);
+        int y1 = min(y + r, img_ycrcb->height);
+        int search_width  = x1 - x0;
+        int search_height = y1 - y0;
+        int square_r = r * r;
+
+        char *image = img_ycrcb->imageData;
+
+        if ((search_width == 0)||(search_height == 0)) return -1;
+
+        for (int i = 0; i < no_point;){
+            int xt = x0 + rand() % search_width;
+            int yt = y0 + rand() % search_height;
+            int square = (x - xt) * (x - xt) + (y - yt) * (y - yt);
+            if (square >= square_r){
+                continue;
+            }
+
+            unsigned char *p = (unsigned char *)&image[(yt * img_ycrcb->width + xt) * 3];
+
+            int y = p[0];
+            int u = p[1];
+            int v = p[2];
+
+            int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
+            assert((hist < 64)&&(hist >= 0));
+            histgram[hist] ++;
+            i++;
+        }
+        float res = 0.0f;
+
+        for(int i = 0; i < NUM_HISTGRAM; i ++){
+            normalizedHistgram[i] = (float)histgram[i] / no_point;
+            res += min(normalizedHistgram[i], referenceHistgram[i]);
+
+            if (!fout){
+                QMessageBox::critical(this, tr("Error"), tr("File cannot open."));
+                return 1;
+            }
+            fout << fixed << setprecision(6) << normalizedHistgram[i] << endl ;
+
+        }
+        return 0;
+}
+
 
 void mouse(int event,int x, int y,int flags,void *param=NULL)
 {
