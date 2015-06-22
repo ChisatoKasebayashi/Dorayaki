@@ -2,6 +2,7 @@
 #include "ui_otameshihistui.h"
 
 
+
 OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::OtameshiHistUI)
@@ -22,7 +23,11 @@ void OtameshiHistUI::oncheckCVImage(int state){
     if(state){
         ui->labeldebug->setText("checked");
         ui->checkCVImage->setEnabled(false);
-        QMessageBox::information(this,tr("CV"),tr("checked"));
+
+        img = cvLoadImage(ui->comboImageName->currentText().toLocal8Bit(), CV_LOAD_IMAGE_COLOR);
+        cvShowImage("Picture",img);
+        cvWaitKey(0);
+        cvDestroyWindow("Picture");
         ui->checkCVImage->setEnabled(true);
         ui->checkCVImage->setChecked(Qt::Unchecked);
     }
@@ -37,5 +42,7 @@ void OtameshiHistUI::onpushStar(){
 
 OtameshiHistUI::~OtameshiHistUI()
 {
+    cvReleaseImage(&img);
     delete ui;
 }
+

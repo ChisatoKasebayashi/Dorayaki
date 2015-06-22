@@ -6,10 +6,6 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 
-//int click_x[2], click_y[2];
-//void mouse(int event ,int x ,int y ,int flags ,void *param);
-//ofstream fout("histogram_log.txt");
-
 namespace Ui {
 class OtameshiHistUI;
 }
@@ -29,6 +25,7 @@ public slots:
 private:
     Ui::OtameshiHistUI *ui;
     void connectSignals();
+    IplImage *img;
 };
 
 #endif // OTAMESHIHISTUI_H
