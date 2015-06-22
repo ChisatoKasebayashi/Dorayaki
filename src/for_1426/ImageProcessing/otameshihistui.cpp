@@ -25,11 +25,11 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
         sceneC.addLine(-200, y*20, 200, y*20, pgray);
         sceneN.addLine(-200, y*20, 200, y*20, pgray);
     }
-    for(int x=-31; x<=31; x++) {
-        scene.addLine(x*6, -80, x*6, 80, pgray);
-        sceneE.addLine(x*6, -80, x*6, 80, pgray);
-        sceneC.addLine(x*6, -80, x*6, 80, pgray);
-        sceneN.addLine(x*6, -80, x*6, 80, pgray);
+    for(int x=-32; x<=32; x++) {
+        scene.addLine(x*6, -90, x*6, 90, pgray);
+        sceneE.addLine(x*6, -90, x*6, 90, pgray);
+        sceneC.addLine(x*6, -90, x*6, 90, pgray);
+        sceneN.addLine(x*6, -90, x*6, 90, pgray);
     }
 }
 
@@ -222,6 +222,9 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
 }
 
 void OtameshiHistUI::plotColorHistogram(float hist, int cnt){
+    cnt = cnt - (NUM_HISTGRAM/2);
+    QPen pHist(QColor(255,200,200),6);
+    scene.addLine(cnt*6+3, 90, cnt*6+3, 90-(int)(200*hist), pHist);
 }
 void OtameshiHistUI::plotEuclid(float ref, float nor, int cnt){
 }
