@@ -79,8 +79,6 @@ void OtameshiHistUI::destHistogram(){
     delete[] referenceHistgram;
     delete[] normalizedHistgram;
     if(img_origin){
-        cvReleaseImage(&img_origin);
-        cvReleaseImage(&img);
         cvReleaseImage(&img_ycrcb);
     }
 }
