@@ -14,22 +14,28 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
 {
     ui->setupUi(this);
     connectSignals();
-    ui->graphicsHistgram->setScene(&scene);
-    ui->graphicsEuclid->setScene(&sceneE);
-    ui->graphicsCos->setScene(&sceneC);
-    ui->graphicsNormalize->setScene(&sceneN);
+    ui->graphicsBallHist->setScene(&scene);
+    ui->graphicsColorHist->setScene(&sceneCol);
+    ui->graphicsReference->setScene(&sceneRef);
+    ui->graphicsEuclid->setScene(&sceneEuc);
+    ui->graphicsCosine->setScene(&sceneCos);
+    ui->graphicsNormalize->setScene(&sceneNor);
     QPen pgray(QColor(200, 200, 200));
     for(int y=-4; y<=4; y++) {
         scene.addLine(-200, y*20, 200, y*20, pgray);
-        sceneE.addLine(-200, y*20, 200, y*20, pgray);
-        sceneC.addLine(-200, y*20, 200, y*20, pgray);
-        sceneN.addLine(-200, y*20, 200, y*20, pgray);
+        sceneRef.addLine(-200, y*20, 200, y*20, pgray);
+        sceneCol.addLine(-200, y*20, 200, y*20, pgray);
+        sceneEuc.addLine(-200, y*20, 200, y*20, pgray);
+        sceneCos.addLine(-200, y*20, 200, y*20, pgray);
+        sceneNor.addLine(-200, y*20, 200, y*20, pgray);
     }
     for(int x=-32; x<=32; x++) {
         scene.addLine(x*6, -90, x*6, 90, pgray);
-        sceneE.addLine(x*6, -90, x*6, 90, pgray);
-        sceneC.addLine(x*6, -90, x*6, 90, pgray);
-        sceneN.addLine(x*6, -90, x*6, 90, pgray);
+        sceneRef.addLine(x*6, -90, x*6, 90, pgray);
+        sceneCol.addLine(x*6, -90, x*6, 90, pgray);
+        sceneEuc.addLine(x*6, -90, x*6, 90, pgray);
+        sceneCos.addLine(x*6, -90, x*6, 90, pgray);
+        sceneNor.addLine(x*6, -90, x*6, 90, pgray);
     }
 }
 
@@ -201,10 +207,12 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             i++;
         }
         float res = 0.0f;
+        double euc_res = 0.0f;
 
         for(int i = 0; i < NUM_HISTGRAM; i ++){
             normalizedHistgram[i] = (float)histgram[i] / no_point;
             res += min(normalizedHistgram[i], referenceHistgram[i]);
+            euc_res += sqrt(pow(normalizedHistgram[i]-referenceHistgram[i],2));
 
             if (!fout){
                 QMessageBox::critical(this, tr("Error"), tr("File cannot open."));
@@ -212,24 +220,69 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             }
             fout << fixed << setprecision(6) << normalizedHistgram[i] << endl ;
 
-            plotColorHistogram(normalizedHistgram[i],i);
+
+            plotBallHistogram(normalizedHistgram[i],i);
+            plotReferenceHistogram(referenceHistgram[i],i);
+            plotColorHistgram(referenceHistgram[i],normalizedHistgram[i],i);
             plotEuclid(referenceHistgram[i],normalizedHistgram[i],i);
             plotCosine(referenceHistgram[i],normalizedHistgram[i],i);
             plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
 
         }
+        double theta = acos(InnerProduct(normalizedHistgram,referenceHistgram,64)/
+                            sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,64)*
+                                        InnerProduct(referenceHistgram,referenceHistgram,64)));
+        ui->lcdScoreColorHist->display(res);
+        ui->lcdScoreEuclid->display(euc_res);
+        ui->lcdScoreCosine->display(theta);
         return 0;
 }
 
-void OtameshiHistUI::plotColorHistogram(float hist, int cnt){
+double OtameshiHistUI::InnerProduct(float vec1[], float vec2[],int n){
+    double s=0.0f;
+    for(int i=0;i<n;i++){
+        s +=vec1[i]*vec2[i];
+    }
+    return s;
+
+}
+
+void OtameshiHistUI::plotBallHistogram(float hist, int cnt){
     cnt = cnt - (NUM_HISTGRAM/2);
-    QPen pHist(QColor(255,200,200),6);
-    scene.addLine(cnt*6+3, 90, cnt*6+3, 90-(int)(200*hist), pHist);
+    QPen pHist(QColor(255,0,0),6);
+    scene.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
 }
+void OtameshiHistUI::plotReferenceHistogram(float hist, int cnt){
+    cnt = cnt - (NUM_HISTGRAM/2);
+    QPen pHist(QColor(0,0,255),6);
+    sceneRef.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
+    sceneCol.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
+    sceneEuc.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
+    sceneCos.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
+    sceneNor.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
+}
+
+void OtameshiHistUI::plotColorHistgram(float ref, float nor, int cnt){
+    float res = 0.0f;
+    cnt = cnt - (NUM_HISTGRAM/2);
+    QPen pHist(QColor(255,100,100),6);
+    res = min(ref, nor);
+    sceneCol.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*res), pHist);
+}
+
 void OtameshiHistUI::plotEuclid(float ref, float nor, int cnt){
+    double res = 0.0f;
+    cnt = cnt - (NUM_HISTGRAM/2);
+    QPen pHist(QColor(100,255,100),6);
+    res = sqrt( pow((ref-nor),2));
+    sceneEuc.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*res), pHist);
 }
+
 void OtameshiHistUI::plotCosine(float ref, float nor, int cnt){
+
+
 }
+
 void OtameshiHistUI::plotNormalize(float ref, float nor, int cnt){
 }
 
