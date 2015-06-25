@@ -29,6 +29,8 @@ public:
 public slots:
     void oncheckCVImage(int state);
     void onpushStar();
+    void Chisato();
+
 
 private:
     Ui::OtameshiHistUI *ui;
@@ -67,6 +69,7 @@ private:
     void plotEuclid(float ref, float nor, int cnt);
     void plotCosine(float ref, float nor, int cnt);
     void plotNormalize(float ref, float nor, int cnt);
+
 
 };
 
