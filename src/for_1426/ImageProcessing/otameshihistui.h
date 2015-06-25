@@ -57,7 +57,7 @@ private:
     void initHistogram();
     void destHistogram();
     void clearColorHistgram();
-    bool loadReferenceColorHistgram(const char *filename);
+    int loadReferenceColorHistgram(const char *filename);
     void mouseEvent();
     int evaluateRadius();
     void drawCircle(int radius, CvPoint center);
