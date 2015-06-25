@@ -45,6 +45,7 @@ void OtameshiHistUI::connectSignals(){
     assert(ret);
     ret = connect(ui->pushStar, SIGNAL(clicked()),this, SLOT(onpushStar()));
     assert(ret);
+    ret = connect(ui->Chisato,SIGNAL(clicked(bool)),this,SLOT(Chisato()));
 }
 
 void OtameshiHistUI::oncheckCVImage(int state){
@@ -286,6 +287,10 @@ void OtameshiHistUI::plotCosine(float ref, float nor, int cnt){
 void OtameshiHistUI::plotNormalize(float ref, float nor, int cnt){
 }
 
+void OtameshiHistUI::Chisato(){
+    QMessageBox::information(this,"seki","seki");
+}
+
 void mouse(int event,int x, int y,int flags,void *param=NULL)
 {
     switch(event)
@@ -304,4 +309,5 @@ void mouse(int event,int x, int y,int flags,void *param=NULL)
             break;
     }
 }
+
 
