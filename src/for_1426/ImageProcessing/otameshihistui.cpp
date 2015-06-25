@@ -229,7 +229,7 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
 
         }
-        double theta = acos(InnerProduct(normalizedHistgram,referenceHistgram,64)/
+        double theta = (InnerProduct(normalizedHistgram,referenceHistgram,64)/
                             sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,64)*
                                         InnerProduct(referenceHistgram,referenceHistgram,64)));
         ui->lcdScoreColorHist->display(res);
