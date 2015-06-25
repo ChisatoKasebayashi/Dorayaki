@@ -6,6 +6,7 @@
 int click_x[2], click_y[2];
 void mouse(int event ,int x ,int y ,int flags ,void *param);
 ofstream fout("histogram_log.txt");
+ifstream fin;
 
 
 OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
@@ -121,16 +122,16 @@ void OtameshiHistUI::clearColorHistgram()
         }
     }
 
-bool OtameshiHistUI::loadReferenceColorHistgram(const char *filename)
+int OtameshiHistUI::loadReferenceColorHistgram(const char *filename)
 {
-    FILE *fp;
-    if (NULL == (fp = fopen(filename, "rt"))) return false;
-
-    for(int i = 0;  i < NUM_HISTGRAM; i ++){
-        fscanf(fp, "%f", &referenceHistgram[i]);
+    fin.open(filename);
+    if(fin.fail()){
+        QMessageBox::critical(this, tr("Error"), tr("reference_histgram.txt cannot find."));
     }
-    fclose(fp);
-    return true;
+    for(int i = 0; i< NUM_HISTGRAM; i++){
+        fin>> referenceHistgram[i];
+    }
+    return 0;
 }
 
 /*
@@ -225,8 +226,8 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             plotBallHistogram(normalizedHistgram[i],i);
             plotReferenceHistogram(referenceHistgram[i],i);
             plotColorHistgram(referenceHistgram[i],normalizedHistgram[i],i);
-            plotEuclid(referenceHistgram[i],normalizedHistgram[i],i);
-            plotCosine(referenceHistgram[i],normalizedHistgram[i],i);
+            //plotEuclid(referenceHistgram[i],normalizedHistgram[i],i);
+            //plotCosine(referenceHistgram[i],normalizedHistgram[i],i);
             plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
 
         }
