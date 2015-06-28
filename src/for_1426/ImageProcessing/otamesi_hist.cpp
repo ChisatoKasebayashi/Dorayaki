@@ -106,7 +106,7 @@ int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
 			int u = p[1];
 			int v = p[2];
 			
-			int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
+			int hist = ((y >> 3) << 4) + ((u >> 6) << 2) + (v >> 6);
 			assert((hist < 64)&&(hist >= 0));
 			histgram[hist] ++;
 			i++;
