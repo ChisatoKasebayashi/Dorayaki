@@ -39,9 +39,6 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
         sceneCos.addLine(x*6, -90, x*6, 90, pgray);
         sceneNor.addLine(x*6, -90, x*6, 90, pgray);
     }
-    for(int x1=-1; x1<=32;x1++){
-        sceneVisual.addLine(x1*10, 10, x1*10, 400, pgray);
-    }
 }
 
 void OtameshiHistUI::connectSignals(){
