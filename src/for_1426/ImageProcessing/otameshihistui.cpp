@@ -18,9 +18,10 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
     ui->graphicsBallHist->setScene(&scene);
     ui->graphicsColorHist->setScene(&sceneCol);
     ui->graphicsReference->setScene(&sceneRef);
-    ui->graphicsEuclid->setScene(&sceneEuc);
-    ui->graphicsCosine->setScene(&sceneCos);
-    ui->graphicsNormalize->setScene(&sceneNor);
+    ui->visualizeColor->setScene(&sceneVisual);
+    //ui->graphicsEuclid->setScene(&sceneEuc);
+    //ui->graphicsCosine->setScene(&sceneCos);
+    //ui->graphicsNormalize->setScene(&sceneNor);
     QPen pgray(QColor(200, 200, 200));
     for(int y=-4; y<=4; y++) {
         scene.addLine(-200, y*20, 200, y*20, pgray);
@@ -37,6 +38,9 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
         sceneEuc.addLine(x*6, -90, x*6, 90, pgray);
         sceneCos.addLine(x*6, -90, x*6, 90, pgray);
         sceneNor.addLine(x*6, -90, x*6, 90, pgray);
+    }
+    for(int x1=-1; x1<=32;x1++){
+        sceneVisual.addLine(x1*10, 10, x1*10, 400, pgray);
     }
 }
 

@@ -52,6 +52,7 @@ private:
     QGraphicsScene sceneEuc;
     QGraphicsScene sceneCos;
     QGraphicsScene sceneNor;
+    QGraphicsScene sceneVisual;
 
     void processingGetColorHistogram();
     void initHistogram();
