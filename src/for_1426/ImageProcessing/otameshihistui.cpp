@@ -39,7 +39,7 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
         sceneCos.addLine(x*6, -90, x*6, 90, pgray);
         sceneNor.addLine(x*6, -90, x*6, 90, pgray);
     }
-    for(int x1=-32 ; x1<=32 ; x1++ ){
+    for(int x1=0 ; x1<=64 ; x1++ ){
         sceneVisual.addLine(x1*20,-300,x1*20,300,pgray);
     }
 }
@@ -308,13 +308,19 @@ void OtameshiHistUI::Chisato(){
     QMessageBox::information(this,"seki","seki");
 }
 void OtameshiHistUI::VisualizeColor(float histgram, int hist, int b, int g, int r){
-    QPen pcolor(QColor(b,g,r),6);
-    sceneVisual.addLine(hist,hist,-hist,hist,pcolor);
-    //Qpen circleColor(QColor(b,g,r),6);
+    QPen pcolor(QColor(b,g,r),20);
+    float a=histgram-1;
+    if(a==-1){
+        sceneVisual.addLine(20*hist,290-20*(histgram),20*hist,290-20*histgram,pcolor);
+    }
+    else{
+       sceneVisual.addLine(20*hist,290-20*(histgram-1),20*hist,290-20*histgram,pcolor);
+    }
+    //Qpen circleColor(QColor(b,g,r),16);
     //circle.drawArc();
     //qDebug() << "ここから関数内"  ;
     //qDebug() << "r=" << r << "g=" << g << "b=" << b;
-    //qDebug() << "0000000000hist=" << hist << "hisrtgram[hist]=" << histgram;
+    qDebug() <<"hist=" << hist << "hisrtgram[hist]=" << histgram;
 
 }
 
