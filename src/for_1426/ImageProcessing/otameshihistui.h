@@ -53,6 +53,7 @@ private:
     QGraphicsScene sceneCos;
     QGraphicsScene sceneNor;
     QGraphicsScene sceneVisual;
+    QPainter circle;
 
     void processingGetColorHistogram();
     void initHistogram();
@@ -70,6 +71,9 @@ private:
     void plotEuclid(float ref, float nor, int cnt);
     void plotCosine(float ref, float nor, int cnt);
     void plotNormalize(float ref, float nor, int cnt);
+    void VisualizeColor(float histgram, int hist, int  b, int g, int r);
+
+
 
 
 };

@@ -26,7 +26,7 @@
     <property name="currentIndex">
      <number>1</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="histogram">
      <attribute name="title">
       <string>Tab 1</string>
      </attribute>
@@ -366,7 +366,7 @@
        <string>■Color_histogram</string>
       </property>
      </widget>
-     <widget class="QGraphicsView" name="visualizeColor">
+     <widget class="QGraphicsView" name="hoge">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -396,10 +396,20 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="color">
      <attribute name="title">
       <string>Tab 2</string>
      </attribute>
+     <widget class="QGraphicsView" name="visualizeColor">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>11</y>
+        <width>1041</width>
+        <height>691</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>

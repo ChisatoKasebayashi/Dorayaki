@@ -42,4 +42,5 @@ public:
 	void clearColorHistgram();
 	bool loadReferenceColorHistgram(const char *filename);
 	void expressHistogram(int no_point);
+	void VisualizeColor(float histgram, int hist, int  y, int u, int v);
 };

@@ -39,6 +39,9 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
         sceneCos.addLine(x*6, -90, x*6, 90, pgray);
         sceneNor.addLine(x*6, -90, x*6, 90, pgray);
     }
+    for(int x1=-32 ; x1<=32 ; x1++ ){
+        sceneVisual.addLine(x1*20,-300,x1*20,300,pgray);
+    }
 }
 
 void OtameshiHistUI::connectSignals(){
@@ -187,6 +190,7 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
         int square_r = r * r;
 
         char *image = img_ycrcb->imageData;
+        char *img = img_origin->imageData;
 
         if ((search_width == 0)||(search_height == 0)) return -1;
 
@@ -199,21 +203,32 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             }
 
             unsigned char *p = (unsigned char *)&image[(yt * img_ycrcb->width + xt) * 3];
+            unsigned char *t = (unsigned char *)&img[(yt * img_origin->width + xt) *3];
 
             int y = p[0];
             int u = p[1];
             int v = p[2];
 
+            int b = t[0];
+            int g = t[1];
+            int r = t[2];
+
+            //qDebug() << "r=" << r << "g=" << g << "b=" << b;
+
             int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
             assert((hist < 64)&&(hist >= 0));
             histgram[hist] ++;
             i++;
+            //qDebug() << "hist=" << hist << "hisrtgram[hist]=" << histgram[hist];
+            VisualizeColor((float) histgram[hist],hist, b, g, r);
         }
+
         float res = 0.0f;
         double euc_res = 0.0f;
 
         for(int i = 0; i < NUM_HISTGRAM; i ++){
             normalizedHistgram[i] = (float)histgram[i] / no_point;
+            //qDebug() << histgram[i] ;
             res += min(normalizedHistgram[i], referenceHistgram[i]);
             euc_res += sqrt(pow(normalizedHistgram[i]-referenceHistgram[i],2));
 
@@ -224,13 +239,13 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             fout << fixed << setprecision(6) << normalizedHistgram[i] << endl ;
 
 
+
             plotBallHistogram(normalizedHistgram[i],i);
             plotReferenceHistogram(referenceHistgram[i],i);
             plotColorHistgram(referenceHistgram[i],normalizedHistgram[i],i);
             //plotEuclid(referenceHistgram[i],normalizedHistgram[i],i);
             //plotCosine(referenceHistgram[i],normalizedHistgram[i],i);
             plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
-
         }
         double theta = (InnerProduct(normalizedHistgram,referenceHistgram,64)/
                             sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,64)*
@@ -291,6 +306,16 @@ void OtameshiHistUI::plotNormalize(float ref, float nor, int cnt){
 
 void OtameshiHistUI::Chisato(){
     QMessageBox::information(this,"seki","seki");
+}
+void OtameshiHistUI::VisualizeColor(float histgram, int hist, int b, int g, int r){
+    QPen pcolor(QColor(b,g,r),6);
+    sceneVisual.addLine(hist,hist,-hist,hist,pcolor);
+    //Qpen circleColor(QColor(b,g,r),6);
+    //circle.drawArc();
+    //qDebug() << "ここから関数内"  ;
+    //qDebug() << "r=" << r << "g=" << g << "b=" << b;
+    //qDebug() << "0000000000hist=" << hist << "hisrtgram[hist]=" << histgram;
+
 }
 
 void mouse(int event,int x, int y,int flags,void *param=NULL)
