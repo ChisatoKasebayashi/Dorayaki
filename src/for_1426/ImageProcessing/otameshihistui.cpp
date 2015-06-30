@@ -64,7 +64,6 @@ void OtameshiHistUI::onpushStar(){
 
 void OtameshiHistUI::onComboImageChangedIndex(){
     QImage VImage;
-    qDebug() << "view";
     VImage.load(ui->comboImageName->currentText());
     ui->labelImage->setPixmap(QPixmap::fromImage(VImage));
 }
@@ -111,15 +110,14 @@ void OtameshiHistUI::initHistogram(){
     radius = 0;
     img_origin = cvLoadImage(ui->comboImageName->currentText().toLocal8Bit(), CV_LOAD_IMAGE_COLOR);
     img = img_origin;
-    if(img_origin){
-        img_ycrcb = cvCreateImage(cvGetSize(img_origin),8,3);
-        cvCvtColor(img_origin, img_ycrcb, CV_BGR2YCrCb);
-    }
     histgram = new int[NUM_HISTGRAM];
     normalizedHistgram = new float[NUM_HISTGRAM];
     referenceHistgram = new float[NUM_HISTGRAM];
     clearColorHistgram();
-    for(int i = 0; i < NUM_HISTGRAM; i ++) referenceHistgram[i] = 0;
+    for(int i = 0; i < NUM_HISTGRAM; i ++){
+        referenceHistgram[i] = 0;
+        histgram[i] = 0;
+    }
     loadReferenceColorHistgram(reference_histgram_filename);
     cvNamedWindow("Picture",CV_WINDOW_AUTOSIZE);
 
@@ -129,11 +127,7 @@ void OtameshiHistUI::destHistogram(){
     delete[] histgram;
     delete[] referenceHistgram;
     delete[] normalizedHistgram;
-    if(img_origin){
-        cvReleaseImage(&img_ycrcb);
-    }
 }
-
 /*
 * imageProcessing::clearColorHistgram
 */
@@ -202,13 +196,13 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
 {
         int x0 = max(x - r, 0);
         int y0 = max(y - r, 0);
-        int x1 = min(x + r, img_ycrcb->width);
-        int y1 = min(y + r, img_ycrcb->height);
+        int x1 = min(x + r, img_origin->width);
+        int y1 = min(y + r, img_origin->height);
         int search_width  = x1 - x0;
         int search_height = y1 - y0;
         int square_r = r * r;
 
-        char *image = img_ycrcb->imageData;
+        char *image = img_origin->imageData;
 
         if ((search_width == 0)||(search_height == 0)) return -1;
 
@@ -220,7 +214,7 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
                 continue;
             }
 
-            unsigned char *p = (unsigned char *)&image[(yt * img_ycrcb->width + xt) * 3];
+            unsigned char *p = (unsigned char *)&image[(yt * img_origin->width + xt) * 3];
 
             int b = p[0];
             int g = p[1];
@@ -228,7 +222,7 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             int y,cb,cr;
             RGB2YCbCr(b,g,r,&y,&cb,&cr);
 
-            qDebug() << '['<<i<<']';
+            //qDebug() << '['<<i<<']';
             //qDebug() << "BGR  ["<<b <<',' << g <<','<< r << ']';
             //qDebug() << "YCbCr["<<y <<',' << cb <<','<< cr << ']';
 
@@ -288,18 +282,18 @@ void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
 }
 
 int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
-    double r = sqrt((pow(cb,2) + pow(cr,2)));
+    double r = sqrt(cb*cb + cr*cr);
     double rad = atan2(cr, cb);
     int theta = ((rad*180) / M_PI);
     if(theta<0)
         theta = 360+theta;
-    qDebug() << 'y' <<y<<'r'<<r;
-    qDebug() << "Cb"<<cb << "Cr"<<cr<< "rad"<<rad << "theta"<<theta;
-    if(r < 10){
+    //qDebug() << 'y' <<y<<'r'<<r;
+    //qDebug() << "Cb"<<cb << "Cr"<<cr<< "rad"<<rad << "theta"<<theta;
+    if(r < 30){
         if(y<50)
-            return NUM_HISTGRAM;
-        else if(150<y)
             return NUM_HISTGRAM-1;
+        else if(150<y)
+            return NUM_HISTGRAM-3;
         else
             return NUM_HISTGRAM-2;
     }
