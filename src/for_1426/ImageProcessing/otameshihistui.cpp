@@ -25,6 +25,8 @@ void OtameshiHistUI::connectSignals(){
     assert(ret);
     ret = connect(ui->pushStar, SIGNAL(clicked()),this, SLOT(onpushStar()));
     assert(ret);
+    ret = connect(ui->comboImageName, SIGNAL(currentIndexChanged(int)),this ,SLOT(onComboImageChangedIndex()));
+    assert(ret);
 }
 
 void OtameshiHistUI::oncheckCVImage(int state){
@@ -41,6 +43,30 @@ void OtameshiHistUI::oncheckCVImage(int state){
 
 void OtameshiHistUI::onpushStar(){
     ui->labeldebug->setText("pushStar!");
+    QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
+    QString home = QDir::homePath();
+    QString strDir = QFileDialog::getExistingDirectory(
+        this,
+        tr("select dir"),
+        home, options);
+    if ( !strDir.isEmpty() )
+    {
+        QDir dir( strDir );
+            QStringList strlFilter;
+            strlFilter << "*.png";
+            QFileInfoList list = dir.entryInfoList( strlFilter, QDir::Files );
+            for ( int i = 0; i < list.size(); i++ )
+            {
+                ui->comboImageName->addItem(strDir +"/" +list[i].fileName());
+            }
+    }
+}
+
+void OtameshiHistUI::onComboImageChangedIndex(){
+    QImage VImage;
+    qDebug() << "view";
+    VImage.load(ui->comboImageName->currentText());
+    ui->labelImage->setPixmap(QPixmap::fromImage(VImage));
 }
 
 OtameshiHistUI::~OtameshiHistUI()
@@ -202,7 +228,7 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             int y,cb,cr;
             RGB2YCbCr(b,g,r,&y,&cb,&cr);
 
-            //qDebug() << '['<<i<<']';
+            qDebug() << '['<<i<<']';
             //qDebug() << "BGR  ["<<b <<',' << g <<','<< r << ']';
             //qDebug() << "YCbCr["<<y <<',' << cb <<','<< cr << ']';
 
@@ -262,13 +288,13 @@ void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
 }
 
 int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
-    double r = sqrt((pow(cb,2)+pow(cr,2)));
+    double r = sqrt((pow(cb,2) + pow(cr,2)));
     double rad = atan2(cr, cb);
     int theta = ((rad*180) / M_PI);
     if(theta<0)
         theta = 360+theta;
-    //qDebug() << 'y' <<y<<'r'<<r;
-    //qDebug() << "Cb"<<cb << "Cr"<<cr<< "rad"<<rad << "theta"<<theta;
+    qDebug() << 'y' <<y<<'r'<<r;
+    qDebug() << "Cb"<<cb << "Cr"<<cr<< "rad"<<rad << "theta"<<theta;
     if(r < 10){
         if(y<50)
             return NUM_HISTGRAM;
@@ -282,7 +308,6 @@ int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
         //qDebug() << "theta=" << theta;
         return theta;
     }
-
 }
 
 void OtameshiHistUI::plotBallHistogram(float hist, int cnt){

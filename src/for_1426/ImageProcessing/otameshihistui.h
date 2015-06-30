@@ -8,6 +8,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QPainter>
+#include <QFileDialog>
 #include <opencv2/opencv.hpp>
 #include <opencv2/opencv_lib.hpp>
 #include <fstream>
@@ -30,6 +31,7 @@ public:
 public slots:
     void oncheckCVImage(int state);
     void onpushStar();
+    void onComboImageChangedIndex();
 
 private:
     Ui::OtameshiHistUI *ui;
