@@ -197,11 +197,17 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
 
             unsigned char *p = (unsigned char *)&image[(yt * img_ycrcb->width + xt) * 3];
 
-            int y = p[0];
-            int u = p[1];
-            int v = p[2];
+            int b = p[0];
+            int g = p[1];
+            int r = p[2];
+            int y,cb,cr;
+            RGB2YCbCr(b,g,r,&y,&cb,&cr);
 
-            int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
+            //qDebug() << '['<<i<<']';
+            //qDebug() << b <<',' << g <<','<< r;
+            //qDebug() << y <<',' << cb <<','<< cr;
+
+            int hist = ((b >> 6) << 4) + ((g >> 6) << 2) + (r >> 6);
             assert((hist < 64)&&(hist >= 0));
             histgram[hist] ++;
             i++;
@@ -245,6 +251,18 @@ double OtameshiHistUI::InnerProduct(float vec1[], float vec2[],int n){
     }
     return s;
 
+}
+
+void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
+    *y = (77*r+150*g+29*b)>>8;
+    *cb= ((b-*y)*144+32768)>>8;
+    *cr= ((r-*y)*182+32768)>>8;
+    *cb -= 128;
+    *cr -= 128;
+
+    *y = std::max(0, std::min(*y, 255));
+    *cb = std::max(-128, std::min(*cb, 127));
+    *cr = std::max(-128, std::min(*cr, 127));
 }
 
 void OtameshiHistUI::plotBallHistogram(float hist, int cnt){
