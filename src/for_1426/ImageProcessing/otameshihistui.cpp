@@ -308,7 +308,7 @@ void OtameshiHistUI::Chisato(){
     QMessageBox::information(this,"seki","seki");
 }
 void OtameshiHistUI::VisualizeColor(float histgram, int hist, int b, int g, int r){
-    QPen pcolor(QColor(b,g,r),20);
+    QPen pcolor(QColor(r,g,b),20);
     float a=histgram-1;
     if(a==-1){
         sceneVisual.addLine(20*hist,290-20*(histgram),20*hist,290-20*histgram,pcolor);
