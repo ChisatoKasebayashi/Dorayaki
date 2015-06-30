@@ -39,7 +39,6 @@ private:
     static const int NUM_HISTGRAM = 48;
     IplImage *img_origin;
     IplImage *img;
-    IplImage *img_ycrcb;
     int x;
     int y;
     int radius;
