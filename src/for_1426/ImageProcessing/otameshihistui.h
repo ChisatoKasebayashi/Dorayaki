@@ -32,6 +32,7 @@ public slots:
     void oncheckCVImage(int state);
     void onpushStar();
     void onComboImageChangedIndex();
+    void Chisato();
 
 private:
     Ui::OtameshiHistUI *ui;
@@ -49,12 +50,14 @@ private:
     QGraphicsScene scene;
     QGraphicsScene sceneRef;
     QGraphicsScene sceneCol;
+    QGraphicsScene sceneVisual;
+    QPainter circle;
 
     void processingGetColorHistogram();
     void initHistogram();
     void destHistogram();
     void clearColorHistgram();
-    bool loadReferenceColorHistgram(const char *filename);
+    int loadReferenceColorHistgram(const char *filename);
     void mouseEvent();
     int evaluateRadius();
     void drawCircle(int radius, CvPoint center);
@@ -66,6 +69,7 @@ private:
     void RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr);
     int polarCoordinatesHistogram(int y,int cb,int cr);
     void setScene();
+    void VisualizeColor(float histgram, int hist, int  b, int g, int r);
 
 };
 

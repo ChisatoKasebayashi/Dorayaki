@@ -106,10 +106,11 @@ int GetColorHistogram::getColorHistgram(int x, int y, int r, int no_point)
 			int u = p[1];
 			int v = p[2];
 			
-			int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
+			int hist = ((y >> 3) << 4) + ((u >> 6) << 2) + (v >> 6);
 			assert((hist < 64)&&(hist >= 0));
 			histgram[hist] ++;
 			i++;
+			//VisualizeColor((float) histgram[hist],hist, y, u, v);
 		}
 		float res = 0.0f;
 
@@ -213,6 +214,16 @@ void GetColorHistogram::calcBallSize()
 	}
 
 #endif
+
+
+void GetColorHistogram::VisualizeColor(float histgram, int hist, int y, int u, int v){
+    //Qpen circleColor(QColor(b,g,r),6);
+    //circle.drawArc();
+    //qDebug() << "ここから関数内"  ;
+    //qDebug() << "r=" << r << "g=" << g << "b=" << b;
+    cout<< "hist=" << hist << "hisrtgram[hist]=" << histgram << endl;
+
+}
 
 int main(){
 	cout << "start" << endl;

@@ -6,6 +6,7 @@
 int click_x[2], click_y[2];
 void mouse(int event ,int x ,int y ,int flags ,void *param);
 ofstream fout("histogram_log.txt");
+ifstream fin;
 
 
 OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
@@ -17,6 +18,7 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
     ui->graphicsBallHist->setScene(&scene);
     ui->graphicsColorHist->setScene(&sceneCol);
     ui->graphicsReference->setScene(&sceneRef);
+    ui->visualizeColor->setScene(&sceneVisual);
 }
 
 void OtameshiHistUI::connectSignals(){
@@ -26,6 +28,8 @@ void OtameshiHistUI::connectSignals(){
     ret = connect(ui->pushStar, SIGNAL(clicked()),this, SLOT(onpushStar()));
     assert(ret);
     ret = connect(ui->comboImageName, SIGNAL(currentIndexChanged(int)),this ,SLOT(onComboImageChangedIndex()));
+    assert(ret);
+    ret = connect(ui->Chisato,SIGNAL(clicked(bool)),this,SLOT(Chisato()));
     assert(ret);
 }
 
@@ -92,8 +96,11 @@ void OtameshiHistUI::setScene(){
     scene.clear();
     sceneRef.clear();
     sceneCol.clear();
-
+    sceneVisual.clear();
     QPen pgray(QColor(200, 200, 200));
+
+    for(int x1=0 ; x1<=64 ; x1++ )
+        sceneVisual.addLine(x1*20,-300,x1*20,300,pgray);
     for(int y=-4; y<=4; y++) {
         scene.addLine(-200, y*20, 200, y*20, pgray);
         sceneRef.addLine(-200, y*20, 200, y*20, pgray);
@@ -109,7 +116,7 @@ void OtameshiHistUI::setScene(){
 void OtameshiHistUI::initHistogram(){
     radius = 0;
     img_origin = cvLoadImage(ui->comboImageName->currentText().toLocal8Bit(), CV_LOAD_IMAGE_COLOR);
-    img = img_origin;
+    img = cvLoadImage(ui->comboImageName->currentText().toLocal8Bit(), CV_LOAD_IMAGE_COLOR);
     histgram = new int[NUM_HISTGRAM];
     normalizedHistgram = new float[NUM_HISTGRAM];
     referenceHistgram = new float[NUM_HISTGRAM];
@@ -139,16 +146,16 @@ void OtameshiHistUI::clearColorHistgram()
         }
     }
 
-bool OtameshiHistUI::loadReferenceColorHistgram(const char *filename)
+int OtameshiHistUI::loadReferenceColorHistgram(const char *filename)
 {
-    FILE *fp;
-    if (NULL == (fp = fopen(filename, "rt"))) return false;
-
-    for(int i = 0;  i < NUM_HISTGRAM; i ++){
-        fscanf(fp, "%f", &referenceHistgram[i]);
+    fin.open(filename);
+    if(fin.fail()){
+        QMessageBox::critical(this, tr("Error"), tr("reference_histgram.txt cannot find."));
     }
-    fclose(fp);
-    return true;
+    for(int i = 0; i< NUM_HISTGRAM; i++){
+        fin>> referenceHistgram[i];
+    }
+    return 0;
 }
 
 /*
@@ -221,7 +228,8 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             int r = p[2];
             int y,cb,cr;
             RGB2YCbCr(b,g,r,&y,&cb,&cr);
-
+            if(r == 255)
+                qDebug() << "[" << i << "]" << r;
             //qDebug() << '['<<i<<']';
             //qDebug() << "BGR  ["<<b <<',' << g <<','<< r << ']';
             //qDebug() << "YCbCr["<<y <<',' << cb <<','<< cr << ']';
@@ -231,7 +239,9 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             assert((hist < NUM_HISTGRAM)&&(hist >= 0));
             histgram[hist] ++;
             i++;
+            VisualizeColor((float) histgram[hist],hist, b, g, r);
         }
+
         float res = 0.0f;
         double euc_res = 0.0f;
 
@@ -324,6 +334,26 @@ void OtameshiHistUI::plotColorHistgram(float ref, float nor, int cnt){
     sceneCol.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*res), pHist);
 }
 
+void OtameshiHistUI::Chisato(){
+    QMessageBox::information(this,"seki","seki");
+}
+void OtameshiHistUI::VisualizeColor(float histgram, int hist, int b, int g, int r){
+    QPen pcolor(QColor(r,g,b),20);
+    float a=histgram-1;
+    if(a==-1){
+        sceneVisual.addLine(20*hist,290-20*(histgram),20*hist,290-20*histgram,pcolor);
+    }
+    else{
+       sceneVisual.addLine(20*hist,290-20*(histgram-1),20*hist,290-20*histgram,pcolor);
+    }
+    //Qpen circleColor(QColor(b,g,r),16);
+    //circle.drawArc();
+    //qDebug() << "ここから関数内"  ;
+    //qDebug() << "r=" << r << "g=" << g << "b=" << b;
+    //qDebug() <<"hist=" << hist << "hisrtgram[hist]=" << histgram;
+
+}
+
 void mouse(int event,int x, int y,int flags,void *param=NULL)
 {
     switch(event)
@@ -342,4 +372,5 @@ void mouse(int event,int x, int y,int flags,void *param=NULL)
             break;
     }
 }
+
 
