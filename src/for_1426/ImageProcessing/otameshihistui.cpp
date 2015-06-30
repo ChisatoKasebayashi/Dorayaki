@@ -203,12 +203,13 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             int y,cb,cr;
             RGB2YCbCr(b,g,r,&y,&cb,&cr);
 
-            //qDebug() << '['<<i<<']';
+            qDebug() << '['<<i<<']';
             //qDebug() << b <<',' << g <<','<< r;
             //qDebug() << y <<',' << cb <<','<< cr;
 
-            int hist = ((b >> 6) << 4) + ((g >> 6) << 2) + (r >> 6);
-            assert((hist < 64)&&(hist >= 0));
+            //int hist = ((b >> 6) << 4) + ((g >> 6) << 2) + (r >> 6);
+            int hist = polarCoordinatesHistogram(y,cb,cr);
+            assert((hist < NUM_HISTGRAM)&&(hist >= 0));
             histgram[hist] ++;
             i++;
         }
@@ -235,9 +236,9 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
 
         }
-        double theta = (InnerProduct(normalizedHistgram,referenceHistgram,64)/
-                            sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,64)*
-                                        InnerProduct(referenceHistgram,referenceHistgram,64)));
+        double theta = (InnerProduct(normalizedHistgram,referenceHistgram,NUM_HISTGRAM)/
+                            sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,NUM_HISTGRAM)*
+                                        InnerProduct(referenceHistgram,referenceHistgram,NUM_HISTGRAM)));
         ui->lcdScoreColorHist->display(res);
         ui->lcdScoreEuclid->display(euc_res);
         ui->lcdScoreCosine->display(theta);
@@ -263,6 +264,30 @@ void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
     *y = std::max(0, std::min(*y, 255));
     *cb = std::max(-128, std::min(*cb, 127));
     *cr = std::max(-128, std::min(*cr, 127));
+}
+
+int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
+    double r = sqrt((pow(cb,2)+pow(cr,2)));
+    double rad = atan2(cr, cb);
+    int theta = ((rad*180) / M_PI) +180;
+    //qDebug() << 'y' <<y<< "Cb"<<cb << "Cr"<<cr;
+    //qDebug() << 'r'<<r << "rad"<<rad << "theta"<<theta;
+    if(r < 10){
+        //qDebug() << "r=" <<r;
+        if(y<50)
+            return NUM_HISTGRAM;
+        else if(150<y)
+            return NUM_HISTGRAM-1;
+        else
+            return NUM_HISTGRAM-2;
+    }
+    else{
+        //qDebug() << "theta=" << theta;
+        theta = (theta>>6)<<6 / (360>>6);
+        //qDebug() << "theta=" << theta;
+        return theta;
+    }
+
 }
 
 void OtameshiHistUI::plotBallHistogram(float hist, int cnt){

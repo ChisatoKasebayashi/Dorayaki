@@ -1,5 +1,6 @@
 #ifndef OTAMESHIHISTUI_H
 #define OTAMESHIHISTUI_H
+#define _USE_MATH_DEFINES
 
 #include <QMainWindow>
 #include <QMessageBox>
@@ -33,7 +34,7 @@ public slots:
 private:
     Ui::OtameshiHistUI *ui;
     void connectSignals();
-    static const int NUM_HISTGRAM = 64;
+    static const int NUM_HISTGRAM = 67;
     IplImage *img_origin;
     IplImage *img;
     IplImage *img_ycrcb;
@@ -68,6 +69,7 @@ private:
     void plotCosine(float ref, float nor, int cnt);
     void plotNormalize(float ref, float nor, int cnt);
     void RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr);
+    int polarCoordinatesHistogram(int y,int cb,int cr);
 
 };
 
