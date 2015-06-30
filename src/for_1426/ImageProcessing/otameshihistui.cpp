@@ -197,12 +197,19 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
 
             unsigned char *p = (unsigned char *)&image[(yt * img_ycrcb->width + xt) * 3];
 
-            int y = p[0];
-            int u = p[1];
-            int v = p[2];
+            int b = p[0];
+            int g = p[1];
+            int r = p[2];
+            int y,cb,cr;
+            RGB2YCbCr(b,g,r,&y,&cb,&cr);
 
-            int hist = ((y >> 6) << 4) + ((u >> 6) << 2) + (v >> 6);
-            assert((hist < 64)&&(hist >= 0));
+            //qDebug() << '['<<i<<']';
+            //qDebug() << "BGR  ["<<b <<',' << g <<','<< r << ']';
+            //qDebug() << "YCbCr["<<y <<',' << cb <<','<< cr << ']';
+
+            //int hist = ((b >> 6) << 4) + ((g >> 6) << 2) + (r >> 6);
+            int hist = polarCoordinatesHistogram(y,cb,cr);
+            assert((hist < NUM_HISTGRAM)&&(hist >= 0));
             histgram[hist] ++;
             i++;
         }
@@ -229,9 +236,9 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
 
         }
-        double theta = (InnerProduct(normalizedHistgram,referenceHistgram,64)/
-                            sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,64)*
-                                        InnerProduct(referenceHistgram,referenceHistgram,64)));
+        double theta = (InnerProduct(normalizedHistgram,referenceHistgram,NUM_HISTGRAM)/
+                            sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,NUM_HISTGRAM)*
+                                        InnerProduct(referenceHistgram,referenceHistgram,NUM_HISTGRAM)));
         ui->lcdScoreColorHist->display(res);
         ui->lcdScoreEuclid->display(euc_res);
         ui->lcdScoreCosine->display(theta);
@@ -244,6 +251,42 @@ double OtameshiHistUI::InnerProduct(float vec1[], float vec2[],int n){
         s +=vec1[i]*vec2[i];
     }
     return s;
+
+}
+
+void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
+    *y = (77*r+150*g+29*b)>>8;
+    *cb= ((b-*y)*144+32768)>>8;
+    *cr= ((r-*y)*182+32768)>>8;
+    *cb -= 128;
+    *cr -= 128;
+
+    *y = std::max(0, std::min(*y, 255));
+    *cb = std::max(-128, std::min(*cb, 127));
+    *cr = std::max(-128, std::min(*cr, 127));
+}
+
+int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
+    double r = sqrt((pow(cb,2)+pow(cr,2)));
+    double rad = atan2(cr, cb);
+    int theta = ((rad*180) / M_PI);
+    if(theta<0)
+        theta = 360+theta;
+    //qDebug() << 'y' <<y<<'r'<<r;
+    //qDebug() << "Cb"<<cb << "Cr"<<cr<< "rad"<<rad << "theta"<<theta;
+    if(r < 10){
+        if(y<50)
+            return NUM_HISTGRAM;
+        else if(150<y)
+            return NUM_HISTGRAM-1;
+        else
+            return NUM_HISTGRAM-2;
+    }
+    else{
+        theta = theta>>3;
+        //qDebug() << "theta=" << theta;
+        return theta;
+    }
 
 }
 
