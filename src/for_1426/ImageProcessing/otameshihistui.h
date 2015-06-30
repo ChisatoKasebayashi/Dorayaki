@@ -48,9 +48,6 @@ private:
     QGraphicsScene scene;
     QGraphicsScene sceneRef;
     QGraphicsScene sceneCol;
-    QGraphicsScene sceneEuc;
-    QGraphicsScene sceneCos;
-    QGraphicsScene sceneNor;
 
     void processingGetColorHistogram();
     void initHistogram();
@@ -65,11 +62,9 @@ private:
     void plotBallHistogram(float hist,int cnt);
     void plotReferenceHistogram(float hist,int cnt);
     void plotColorHistgram(float ref, float nor, int cnt);
-    void plotEuclid(float ref, float nor, int cnt);
-    void plotCosine(float ref, float nor, int cnt);
-    void plotNormalize(float ref, float nor, int cnt);
     void RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr);
     int polarCoordinatesHistogram(int y,int cb,int cr);
+    void setScene();
 
 };
 

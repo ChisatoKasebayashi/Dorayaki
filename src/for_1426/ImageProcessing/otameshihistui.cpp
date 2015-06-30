@@ -17,26 +17,6 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
     ui->graphicsBallHist->setScene(&scene);
     ui->graphicsColorHist->setScene(&sceneCol);
     ui->graphicsReference->setScene(&sceneRef);
-    ui->graphicsEuclid->setScene(&sceneEuc);
-    ui->graphicsCosine->setScene(&sceneCos);
-    ui->graphicsNormalize->setScene(&sceneNor);
-    QPen pgray(QColor(200, 200, 200));
-    for(int y=-4; y<=4; y++) {
-        scene.addLine(-200, y*20, 200, y*20, pgray);
-        sceneRef.addLine(-200, y*20, 200, y*20, pgray);
-        sceneCol.addLine(-200, y*20, 200, y*20, pgray);
-        sceneEuc.addLine(-200, y*20, 200, y*20, pgray);
-        sceneCos.addLine(-200, y*20, 200, y*20, pgray);
-        sceneNor.addLine(-200, y*20, 200, y*20, pgray);
-    }
-    for(int x=-32; x<=32; x++) {
-        scene.addLine(x*6, -90, x*6, 90, pgray);
-        sceneRef.addLine(x*6, -90, x*6, 90, pgray);
-        sceneCol.addLine(x*6, -90, x*6, 90, pgray);
-        sceneEuc.addLine(x*6, -90, x*6, 90, pgray);
-        sceneCos.addLine(x*6, -90, x*6, 90, pgray);
-        sceneNor.addLine(x*6, -90, x*6, 90, pgray);
-    }
 }
 
 void OtameshiHistUI::connectSignals(){
@@ -69,6 +49,7 @@ OtameshiHistUI::~OtameshiHistUI()
 }
 
 void OtameshiHistUI::processingGetColorHistogram(){
+    setScene();
     initHistogram();
     cvShowImage("Picture",img_origin);
     mouseEvent();
@@ -80,6 +61,24 @@ void OtameshiHistUI::processingGetColorHistogram(){
     cvWaitKey(0);
     cvDestroyWindow("Picture");
     destHistogram();
+}
+
+void OtameshiHistUI::setScene(){
+    scene.clear();
+    sceneRef.clear();
+    sceneCol.clear();
+
+    QPen pgray(QColor(200, 200, 200));
+    for(int y=-4; y<=4; y++) {
+        scene.addLine(-200, y*20, 200, y*20, pgray);
+        sceneRef.addLine(-200, y*20, 200, y*20, pgray);
+        sceneCol.addLine(-200, y*20, 200, y*20, pgray);
+    }
+    for(int x=-32; x<=32; x++) {
+        scene.addLine(x*6, -90, x*6, 90, pgray);
+        sceneRef.addLine(x*6, -90, x*6, 90, pgray);
+        sceneCol.addLine(x*6, -90, x*6, 90, pgray);
+    }
 }
 
 void OtameshiHistUI::initHistogram(){
@@ -231,10 +230,6 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             plotBallHistogram(normalizedHistgram[i],i);
             plotReferenceHistogram(referenceHistgram[i],i);
             plotColorHistgram(referenceHistgram[i],normalizedHistgram[i],i);
-            plotEuclid(referenceHistgram[i],normalizedHistgram[i],i);
-            plotCosine(referenceHistgram[i],normalizedHistgram[i],i);
-            plotNormalize(referenceHistgram[i],normalizedHistgram[i],i);
-
         }
         double theta = (InnerProduct(normalizedHistgram,referenceHistgram,NUM_HISTGRAM)/
                             sqrt(InnerProduct(normalizedHistgram,normalizedHistgram,NUM_HISTGRAM)*
@@ -300,9 +295,6 @@ void OtameshiHistUI::plotReferenceHistogram(float hist, int cnt){
     QPen pHist(QColor(0,0,255),6);
     sceneRef.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
     sceneCol.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
-    sceneEuc.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
-    sceneCos.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
-    sceneNor.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*hist), pHist);
 }
 
 void OtameshiHistUI::plotColorHistgram(float ref, float nor, int cnt){
@@ -311,22 +303,6 @@ void OtameshiHistUI::plotColorHistgram(float ref, float nor, int cnt){
     QPen pHist(QColor(255,100,100),6);
     res = min(ref, nor);
     sceneCol.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*res), pHist);
-}
-
-void OtameshiHistUI::plotEuclid(float ref, float nor, int cnt){
-    double res = 0.0f;
-    cnt = cnt - (NUM_HISTGRAM/2);
-    QPen pHist(QColor(100,255,100),6);
-    res = sqrt( pow((ref-nor),2));
-    sceneEuc.addLine(cnt*6+3, 100, cnt*6+3, 100-(int)(200*res), pHist);
-}
-
-void OtameshiHistUI::plotCosine(float ref, float nor, int cnt){
-
-
-}
-
-void OtameshiHistUI::plotNormalize(float ref, float nor, int cnt){
 }
 
 void mouse(int event,int x, int y,int flags,void *param=NULL)
