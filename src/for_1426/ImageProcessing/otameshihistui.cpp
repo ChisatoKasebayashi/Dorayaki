@@ -203,9 +203,9 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             int y,cb,cr;
             RGB2YCbCr(b,g,r,&y,&cb,&cr);
 
-            qDebug() << '['<<i<<']';
-            //qDebug() << b <<',' << g <<','<< r;
-            //qDebug() << y <<',' << cb <<','<< cr;
+            //qDebug() << '['<<i<<']';
+            //qDebug() << "BGR  ["<<b <<',' << g <<','<< r << ']';
+            //qDebug() << "YCbCr["<<y <<',' << cb <<','<< cr << ']';
 
             //int hist = ((b >> 6) << 4) + ((g >> 6) << 2) + (r >> 6);
             int hist = polarCoordinatesHistogram(y,cb,cr);
@@ -269,11 +269,12 @@ void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
 int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
     double r = sqrt((pow(cb,2)+pow(cr,2)));
     double rad = atan2(cr, cb);
-    int theta = ((rad*180) / M_PI) +180;
-    //qDebug() << 'y' <<y<< "Cb"<<cb << "Cr"<<cr;
-    //qDebug() << 'r'<<r << "rad"<<rad << "theta"<<theta;
+    int theta = ((rad*180) / M_PI);
+    if(theta<0)
+        theta = 360+theta;
+    //qDebug() << 'y' <<y<<'r'<<r;
+    //qDebug() << "Cb"<<cb << "Cr"<<cr<< "rad"<<rad << "theta"<<theta;
     if(r < 10){
-        //qDebug() << "r=" <<r;
         if(y<50)
             return NUM_HISTGRAM;
         else if(150<y)
@@ -282,8 +283,7 @@ int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
             return NUM_HISTGRAM-2;
     }
     else{
-        //qDebug() << "theta=" << theta;
-        theta = (theta>>6)<<6 / (360>>6);
+        theta = theta>>3;
         //qDebug() << "theta=" << theta;
         return theta;
     }
