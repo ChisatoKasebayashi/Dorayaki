@@ -37,7 +37,8 @@ public slots:
 private:
     Ui::OtameshiHistUI *ui;
     void connectSignals();
-    static const int NUM_HISTGRAM = 48;
+//    static const int NUM_HISTGRAM = 48;
+    static const int NUM_HISTGRAM = 64;
     IplImage *img_origin;
     IplImage *img;
     int x;

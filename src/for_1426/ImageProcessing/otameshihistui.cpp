@@ -15,6 +15,8 @@ OtameshiHistUI::OtameshiHistUI(QWidget *parent) :
 {
     ui->setupUi(this);
     connectSignals();
+    referenceHistgram = new float[NUM_HISTGRAM];
+    loadReferenceColorHistgram(reference_histgram_filename);
     ui->graphicsBallHist->setScene(&scene);
     ui->graphicsColorHist->setScene(&sceneCol);
     ui->graphicsReference->setScene(&sceneRef);
@@ -49,6 +51,7 @@ void OtameshiHistUI::onpushStar(){
     ui->labeldebug->setText("pushStar!");
     QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
     QString home = QDir::homePath();
+    home += "/Desktop";
     QString strDir = QFileDialog::getExistingDirectory(
         this,
         tr("select dir"),
@@ -75,6 +78,7 @@ void OtameshiHistUI::onComboImageChangedIndex(){
 OtameshiHistUI::~OtameshiHistUI()
 {
     delete ui;
+    delete[] referenceHistgram;
 }
 
 void OtameshiHistUI::processingGetColorHistogram(){
@@ -119,20 +123,16 @@ void OtameshiHistUI::initHistogram(){
     img = cvLoadImage(ui->comboImageName->currentText().toLocal8Bit(), CV_LOAD_IMAGE_COLOR);
     histgram = new int[NUM_HISTGRAM];
     normalizedHistgram = new float[NUM_HISTGRAM];
-    referenceHistgram = new float[NUM_HISTGRAM];
     clearColorHistgram();
     for(int i = 0; i < NUM_HISTGRAM; i ++){
-        referenceHistgram[i] = 0;
         histgram[i] = 0;
     }
-    loadReferenceColorHistgram(reference_histgram_filename);
     cvNamedWindow("Picture",CV_WINDOW_AUTOSIZE);
 
 }
 
 void OtameshiHistUI::destHistogram(){
     delete[] histgram;
-    delete[] referenceHistgram;
     delete[] normalizedHistgram;
 }
 /*
@@ -234,8 +234,8 @@ int OtameshiHistUI::getColorHistgram(int x, int y, int r, int no_point)
             //qDebug() << "BGR  ["<<b <<',' << g <<','<< r << ']';
             //qDebug() << "YCbCr["<<y <<',' << cb <<','<< cr << ']';
 
-            //int hist = ((b >> 6) << 4) + ((g >> 6) << 2) + (r >> 6);
-            int hist = polarCoordinatesHistogram(y,cb,cr);
+            int hist = ((y >> 6) << 4) + ((cb >> 6) << 2) + (cr >> 6);
+            //int hist = polarCoordinatesHistogram(y,cb,cr);
             assert((hist < NUM_HISTGRAM)&&(hist >= 0));
             histgram[hist] ++;
             i++;
@@ -283,12 +283,12 @@ void OtameshiHistUI::RGB2YCbCr(int b, int g, int r, int *y, int *cb,int *cr){
     *y = (77*r+150*g+29*b)>>8;
     *cb= ((b-*y)*144+32768)>>8;
     *cr= ((r-*y)*182+32768)>>8;
-    *cb -= 128;
-    *cr -= 128;
+//    *cb -= 128;
+//    *cr -= 128;
 
     *y = std::max(0, std::min(*y, 255));
-    *cb = std::max(-128, std::min(*cb, 127));
-    *cr = std::max(-128, std::min(*cr, 127));
+//    *cb = std::max(-128, std::min(*cb, 127));
+//    *cr = std::max(-128, std::min(*cr, 127));
 }
 
 int OtameshiHistUI::polarCoordinatesHistogram(int y, int cb, int cr){
