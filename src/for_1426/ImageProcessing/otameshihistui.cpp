@@ -1,10 +1,8 @@
-#include "otameshihistui.h"
+﻿#include "otameshihistui.h"
 #include "ui_otameshihistui.h"
 
 #define reference_histgram_filename "reference_histgram.txt"
 
-int click_x[2], click_y[2];
-void mouse(int event ,int x ,int y ,int flags ,void *param);
 ofstream fout("histogram_log.txt");
 ifstream fin;
 
@@ -163,7 +161,7 @@ int OtameshiHistUI::loadReferenceColorHistgram(const char *filename)
 */
 void OtameshiHistUI::mouseEvent()
 {
-    cvSetMouseCallback("Picture",mouse);
+    setMouseCallback("Picture",this->mouse);
     cvWaitKey(0);
     radius = evaluateRadius();
 }
@@ -354,7 +352,7 @@ void OtameshiHistUI::VisualizeColor(float histgram, int hist, int b, int g, int 
 
 }
 
-void mouse(int event,int x, int y,int flags,void *param=NULL)
+void OtameshiHistUI::mouse(int event,int x, int y,int flags)
 {
     switch(event)
     {
@@ -372,5 +370,3 @@ void mouse(int event,int x, int y,int flags,void *param=NULL)
             break;
     }
 }
-
-
