@@ -26,6 +26,7 @@ public:
 
 private slots:
     void onPushSelectFolder();
+    void onPushSaveto();
     void onMouseMovedGraphicsImage(int x, int y ,Qt::MouseButton button);
     void onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton button);
     void onPushSkip();

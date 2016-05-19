@@ -10,13 +10,18 @@ photoclipping::photoclipping(QWidget *parent) :
     ui->setupUi(this);
     ui->graphicsImage->setScene(&scene);
     connectSignals();
-    const QString saveto = settings.value("SAVEDIR",QDir::homePath() + "/Pictures").toString();
     if(settings.value("IMAGEDIR").toString().size())
     {
         QString imagedir = settings.value("IMAGEDIR").toString();
         setFileList(imagedir);
     }
-    ui->comboSaveto->insertItem(0, saveto);
+    if(settings.value("SAVEDIR",QDir::homePath() + "/Pictures").toString().size())
+    {
+        settings.remove("SAVEDIR");
+        QString saveto = settings.value("SAVEDIR",QDir::homePath() + "/Pictures").toString();
+        ui->comboSaveto->insertItem(0, saveto);
+        ui->comboSaveto->setCurrentIndex(0);
+    }
 }
 
 photoclipping::~photoclipping()
@@ -33,6 +38,7 @@ void photoclipping::connectSignals()
     connect(ui->graphicsImage, SIGNAL(mouseReleased(int,int, Qt::MouseButton)), this, SLOT(onMouseReleasedGraphicImage(int,int, Qt::MouseButton)));
     connect(ui->pushSkip, SIGNAL(clicked()), this, SLOT(onPushSkip()));
     connect(ui->pushRevart, SIGNAL(clicked()), this, SLOT(onPushRevart()));
+    connect(ui->pushSaveto, SIGNAL(clicked()), this, SLOT(onPushSaveto()));
 }
 
 void photoclipping::onPushSelectFolder()
@@ -43,6 +49,13 @@ void photoclipping::onPushSelectFolder()
     {
         setFileList(dir.path());
     }
+}
+
+void photoclipping::onPushSaveto()
+{
+    QDir dir = myq.selectDir();
+    ui->comboSaveto->insertItem(0,dir.path());
+    ui->comboSaveto->setCurrentIndex(0);
 }
 
 void photoclipping::setFileList(QString dirpath)
@@ -117,6 +130,7 @@ int photoclipping::drawImage(QString filepath)
         return 1;
     scene.addPixmap(myq.MatBGR2pixmap(img_now));
     ui->graphicsImage->setMinimumSize(img_now.cols, img_now.rows);
+    ui->graphicsImage->setMaximumSize(img_now.cols+2, img_now.rows+2);
     ui->labelImageNum->setText(QString("%1 / %2").arg(imglist.size()-count).arg(imglist.size()));
     return 0;
 }
@@ -126,8 +140,8 @@ void photoclipping::CorrectCoordinatesOfOutside(int &x, int &y)
 {
     x = (x > ui->spinSize->value()/2) ?x:ui->spinSize->value()/2;
     y = (y > ui->spinSize->value()/2) ?y:ui->spinSize->value()/2;
-    x = (x < img_now.cols - ui->spinSize->value()/2) ?x:img_now.cols - ui->spinSize->value()/2 -2;
-    y = (y < img_now.rows - ui->spinSize->value()/2) ?y:img_now.rows - ui->spinSize->value()/2 -2;
+    x = (x < img_now.cols - ui->spinSize->value()/2) ?x:img_now.cols - ui->spinSize->value()/2;
+    y = (y < img_now.rows - ui->spinSize->value()/2) ?y:img_now.rows - ui->spinSize->value()/2;
 }
 
 void photoclipping::photoSaveImage(cv::Mat src)
