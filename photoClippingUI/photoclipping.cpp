@@ -3,13 +3,13 @@
 
 photoclipping::photoclipping(QWidget *parent) :
     QWidget(parent),
-    count(0),
     settings(QDir::homePath()+"/photoClipping.ini", QSettings::IniFormat),
     ui(new Ui::photoclipping)
 {
     ui->setupUi(this);
-    ui->graphicsImage->setScene(&scene);
     connectSignals();
+    ui->graphicsImage->setScene(&scene);
+    count = settings.value("SAVECOUNT",0).toInt();
     if(settings.value("IMAGEDIR").toString().size())
     {
         QString imagedir = settings.value("IMAGEDIR").toString();
@@ -22,7 +22,6 @@ photoclipping::photoclipping(QWidget *parent) :
         ui->comboSaveto->insertItem(0, saveto);
         ui->comboSaveto->setCurrentIndex(0);
     }
-    count = settings.value("SAVECOUNT",0).toInt();
 }
 
 photoclipping::~photoclipping()
@@ -65,7 +64,7 @@ void photoclipping::setFileList(QString dirpath)
     ui->lineSelectFolder->setText(dirpath);
     imglist = myq.scanFiles(dirpath,"*.png");
     ui->labelImageNum->setText(QString("%1 / %1").arg(imglist.size()));
-    if(imglist.size())
+    if(count < imglist.size())
     {
         drawImage(imglist[count].filePath());
     }
@@ -73,7 +72,7 @@ void photoclipping::setFileList(QString dirpath)
 
 void photoclipping::onMouseMovedGraphicsImage(int x,int y ,Qt::MouseButton button)
 {
-    if(imglist.size())
+    if(count < imglist.size())
     {
         scene.clear();
         drawImage(imglist[count].filePath());
@@ -90,7 +89,7 @@ void photoclipping::onMouseMovedGraphicsImage(int x,int y ,Qt::MouseButton butto
 
 void photoclipping::onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton button)
 {
-    if(imglist.size() && button == Qt::LeftButton)
+    if(count < imglist.size() && button == Qt::LeftButton)
     {
         CorrectCoordinatesOfOutside(x,y);
         scene.addRect(x - ui->spinSize->value()/2
@@ -117,6 +116,12 @@ void photoclipping::onPushSkip()
         RecentImg.clear();
         drawImage(imglist[count].filePath());
     }
+    else
+    {
+        scene.clear();
+        ui->labelPreview->setText("exit");
+        ui->labelImageNum->setText(QString("%1 / %2").arg(imglist.size()-count).arg(imglist.size()));
+    }
     ui->pushRevart->setEnabled(TRUE);
 }
 
@@ -137,7 +142,6 @@ int photoclipping::drawImage(QString filepath)
     scene.addPixmap(myq.MatBGR2pixmap(img_now));
     ui->graphicsImage->setMinimumSize(img_now.cols, img_now.rows);
     ui->graphicsImage->setMaximumSize(img_now.cols+2, img_now.rows+2);
-    ui->labelImageNum->setText(QString("%1 / %2").arg(imglist.size()-count).arg(imglist.size()));
     ui->labelFilename->setText(imglist[count].fileName());
     return 0;
 }
@@ -168,5 +172,6 @@ void photoclipping::photoSaveImage(cv::Mat src)
     {
         scene.clear();
         ui->labelPreview->setText("exit");
+        ui->labelImageNum->setText(QString("%1 / %2").arg(imglist.size()-count).arg(imglist.size()));
     }
 }
