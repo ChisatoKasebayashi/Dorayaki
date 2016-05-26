@@ -22,12 +22,14 @@ photoclipping::photoclipping(QWidget *parent) :
         ui->comboSaveto->insertItem(0, saveto);
         ui->comboSaveto->setCurrentIndex(0);
     }
+    count = settings.value("SAVECOUNT",0).toInt();
 }
 
 photoclipping::~photoclipping()
 {
     settings.setValue("SAVEDIR",ui->comboSaveto->currentText());
     settings.setValue("IMAGEDIR",ui->lineSelectFolder->text());
+    settings.setValue("SAVECOUNT",count);
     delete ui;
 }
 
@@ -111,7 +113,11 @@ void photoclipping::onPushSkip()
 {
     count++;
     if(count < imglist.size())
+    {
+        RecentImg.clear();
         drawImage(imglist[count].filePath());
+    }
+    ui->pushRevart->setEnabled(TRUE);
 }
 
 void photoclipping::onPushRevart()
@@ -132,6 +138,7 @@ int photoclipping::drawImage(QString filepath)
     ui->graphicsImage->setMinimumSize(img_now.cols, img_now.rows);
     ui->graphicsImage->setMaximumSize(img_now.cols+2, img_now.rows+2);
     ui->labelImageNum->setText(QString("%1 / %2").arg(imglist.size()-count).arg(imglist.size()));
+    ui->labelFilename->setText(imglist[count].fileName());
     return 0;
 }
 
@@ -147,7 +154,7 @@ void photoclipping::CorrectCoordinatesOfOutside(int &x, int &y)
 void photoclipping::photoSaveImage(cv::Mat src)
 {
     QDir dir = myq.makeDirectory(ui->comboSaveto->currentText(),ui->comboLabel->currentText());
-    int cnt = myq.scanFiles(dir.path(),"*.png").size();
+    int cnt = count;
     RecentImg = dir.path() + "/" + myq.filenameGen(ui->comboLabel->currentText(),cnt);
     cv::imwrite(RecentImg.toStdString(),src);
     qDebug() << "Saved :" << RecentImg;
