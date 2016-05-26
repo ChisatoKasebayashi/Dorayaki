@@ -30,17 +30,19 @@ private slots:
     void onMouseMovedGraphicsImage(int x, int y ,Qt::MouseButton button);
     void onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton button);
     void onPushSkip();
-    void onPushRevart();
+    void onPushRevert();
+    void currentIndexChangedLabel();
 
 private:
     Ui::photoclipping *ui;
     void connectSignals();
     MyQclass myq;
     int count;
+    int save_count;
     cv::Mat img_now;
     QFileInfoList imglist;
     QGraphicsScene scene;
-    QString RecentImg;
+    std::vector<QString> RecentImg;
     QSettings settings;
 };
 

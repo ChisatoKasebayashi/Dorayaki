@@ -97,12 +97,12 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QPushButton" name="pushRevart">
+       <widget class="QPushButton" name="pushRevert">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Revart</string>
+         <string>Revert</string>
         </property>
        </widget>
       </item>

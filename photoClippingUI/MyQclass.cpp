@@ -84,9 +84,10 @@ QDir MyQclass::makeDirectory(QString targetPath, QString dirname)
 QString MyQclass::filenameGen(QString objectname,int num,QString extension)
 {
     QDateTime dateTime = QDateTime::currentDateTime();
-    QString fname = QString("%1%2%3%4")
+    QString fname = QString("%1%2%3%4%5")
             .arg(objectname)
             .arg(dateTime.date().toString("MMdd"))
+            .arg(dateTime.time().toString("hhmm"))
             .arg(num+1,5,10,QChar('0'))
             .arg(extension);
     return fname;
