@@ -110,7 +110,7 @@ void photoclipping::onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton bu
                                                                     ,ui->spinSize->value(),ui->spinSize->value()));
         cv::Mat clp(img_now,cv::Rect(x - ui->spinSize->value()/2, y - ui->spinSize->value()/2, ui->spinSize->value(),ui->spinSize->value()));
 
-        /*tmp.fn          = imglist[count].fileName();
+        tmp.fn          = imglist[count].fileName();
         tmp.fn.chop(4);
         tmp.filename    = QString("Image filename : \"%1\"").arg(imglist[count].fileName());
         tmp.size        = QString("Image size (X x Y x C) : %1 x %2 x %3").arg(img_now.cols).arg(img_now.rows).arg(img_now.channels());
@@ -124,7 +124,8 @@ void photoclipping::onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton bu
                 .arg(y - ui->spinSize->value()/2)
                 .arg(x + ui->spinSize->value()/2)
                 .arg(y + ui->spinSize->value()/2);
-        tmp.obj_tmp.push_back(tmp2);*/
+        tmp.obj_tmp.push_back(tmp2);
+        img_tmp.push_back(tmp);
         tmp3.fn = imglist[count].fileName();
         tmp3.fn.chop(4);
         tmp3.x = (float)x/img_now.cols;
@@ -288,7 +289,7 @@ void photoclipping::outputtxt()
         }
         ofs.close();
     }
-    qDebug() << " --- Step Annotations ---(" << YOLOimg_tmp.size() << ")";
+    qDebug() << " --- Step YOLO_Annotations ---(" << YOLOimg_tmp.size() << ")";
     for(int i=0; i<YOLOimg_tmp.size();i++)
     {
         std::ofstream ofs;
