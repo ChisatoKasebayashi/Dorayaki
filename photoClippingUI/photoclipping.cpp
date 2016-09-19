@@ -22,6 +22,7 @@ photoclipping::photoclipping(QWidget *parent) :
         ui->comboSaveto->insertItem(0, saveto);
         ui->comboSaveto->setCurrentIndex(0);
         myq.makeDirectory(saveto, "Annotations");
+        myq.makeDirectory(saveto, "YOLO_Annotations");
     }
     currentIndexChangedLabel();
 }
@@ -63,6 +64,7 @@ void photoclipping::onPushSaveto()
     ui->comboSaveto->setCurrentIndex(0);
     currentIndexChangedLabel();
     myq.makeDirectory(dir.path(), "Annotations");
+    myq.makeDirectory(dir.path(), "YOLO_Annotations");
 }
 
 void photoclipping::setFileList(QString dirpath)
@@ -94,6 +96,7 @@ void photoclipping::onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton bu
 {
     image_tmp tmp;
     object_tmp tmp2;
+    yolo_tmp tmp3;
     if(count < imglist.size() && button == Qt::LeftButton)
     {
         CorrectCoordinatesOfOutside(x,y);
@@ -107,7 +110,7 @@ void photoclipping::onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton bu
                                                                     ,ui->spinSize->value(),ui->spinSize->value()));
         cv::Mat clp(img_now,cv::Rect(x - ui->spinSize->value()/2, y - ui->spinSize->value()/2, ui->spinSize->value(),ui->spinSize->value()));
 
-        tmp.fn          = imglist[count].fileName();
+        /*tmp.fn          = imglist[count].fileName();
         tmp.fn.chop(4);
         tmp.filename    = QString("Image filename : \"%1\"").arg(imglist[count].fileName());
         tmp.size        = QString("Image size (X x Y x C) : %1 x %2 x %3").arg(img_now.cols).arg(img_now.rows).arg(img_now.channels());
@@ -121,8 +124,15 @@ void photoclipping::onMouseReleasedGraphicImage(int x, int y ,Qt::MouseButton bu
                 .arg(y - ui->spinSize->value()/2)
                 .arg(x + ui->spinSize->value()/2)
                 .arg(y + ui->spinSize->value()/2);
-        tmp.obj_tmp.push_back(tmp2);
-        img_tmp.push_back(tmp);
+        tmp.obj_tmp.push_back(tmp2);*/
+        tmp3.fn = imglist[count].fileName();
+        tmp3.fn.chop(4);
+        tmp3.x = (float)x/img_now.cols;
+        tmp3.y = (float)y/img_now.rows;
+        tmp3.w = (float)ui->spinSize->value()/img_now.cols;
+        tmp3.h = (float)ui->spinSize->value()/img_now.rows;
+        YOLOimg_tmp.push_back(tmp3);
+
 
         photoSaveImage(clp);
     }
@@ -276,6 +286,15 @@ void photoclipping::outputtxt()
             ofs << img_tmp[i].obj_tmp[j].center.toStdString() << std::endl;
             ofs << img_tmp[i].obj_tmp[j].box.toStdString() << std::endl;
         }
+        ofs.close();
+    }
+    qDebug() << " --- Step Annotations ---(" << YOLOimg_tmp.size() << ")";
+    for(int i=0; i<YOLOimg_tmp.size();i++)
+    {
+        std::ofstream ofs;
+        ofs.open(QString(ui->comboSaveto->currentText() + "/YOLO_Annotations/" + YOLOimg_tmp[i].fn +".txt").toLocal8Bit(), std::ios_base::app);
+        QString str = QString("1 %1 %2 %3 %4").arg(YOLOimg_tmp[i].x).arg(YOLOimg_tmp[i].y).arg(YOLOimg_tmp[i].w).arg(YOLOimg_tmp[i].h);
+        ofs << str.toStdString() << std::endl;
         ofs.close();
     }
 }

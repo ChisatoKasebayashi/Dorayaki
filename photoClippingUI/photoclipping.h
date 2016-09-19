@@ -62,6 +62,15 @@ private:
         QString groundtruth;
         std::vector<object_tmp> obj_tmp;
     };
+    struct yolo_tmp
+    {
+        QString fn;
+        float x;
+        float y;
+        float w;
+        float h;
+    };
+    std::vector<yolo_tmp> YOLOimg_tmp;
     std::vector<image_tmp> img_tmp;
     void wheelEvent(QWheelEvent *pEvent);
     struct cursur_point
