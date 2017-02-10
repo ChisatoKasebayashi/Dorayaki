@@ -1,4 +1,4 @@
-#ifndef OTAMESHIHISTUI_H
+﻿#ifndef OTAMESHIHISTUI_H
 #define OTAMESHIHISTUI_H
 #define _USE_MATH_DEFINES
 
@@ -53,6 +53,9 @@ private:
     QGraphicsScene sceneVisual;
     QPainter circle;
 
+    int click_x[2];
+    int click_y[2];
+
     void processingGetColorHistogram();
     void initHistogram();
     void destHistogram();
@@ -70,6 +73,12 @@ private:
     int polarCoordinatesHistogram(int y,int cb,int cr);
     void setScene();
     void VisualizeColor(float histgram, int hist, int  b, int g, int r);
+
+    void mouse(int event,int x,int y,int flags);
+
+    static void mouse(int event,int x,int y,int flags,void* param){
+        static_cast<OtameshiHistUI*>(param)->mouse(event,x,y,flags);
+    }
 
 };
 
